@@ -18,8 +18,18 @@ const john = {
     ]
 };
 
-const name = john.name, age = john.age, firstEmail = john.emails[0], city = john.address.city, state = john.address.state;
-console.log(name, age, firstEmail, city, state);
+// const name = john.name, age = john.age, firstEmail = john.emails[0], city = john.address.city, state = john.address.state;
 
 // do the same with object destructuring...
-// todo...
+const {
+    age,
+    name,
+    emails: [firstEmail],
+    address: {
+        city,
+        state
+    },
+} = john;
+
+console.log(name, age, firstEmail, city, state);
+// console.log(name, age, firstEmail, city, state);

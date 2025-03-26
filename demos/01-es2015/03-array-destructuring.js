@@ -9,8 +9,9 @@ const weekdays = [
     'Fri'
 ];
 
-const first = weekdays[0], second = weekdays[1], fifth = weekdays[4];
-console.log(first, second, fifth);
+// const first = weekdays[0], second = weekdays[1], fifth = weekdays[4];
 
 // do the same with array destructuring...
-// todo...
+const [first, second, , , fifth] = weekdays;
+
+console.log(first, second, fifth);
