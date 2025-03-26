@@ -1,0 +1,61 @@
+<!-- ! + Enter -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Class component</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // props will be in a data member called props (this.props)
+            class Button extends React.Component {
+                // constructor(props) {
+                //     super(props); // the super class (React.Component) sets up `this.props = props;`
+                // }
+
+                // event handler can be set up using arrow function syntax (preferably)
+                clickHandler = () => {
+                    // const { title } = this.props;
+                    alert(`Button ${this.props.title} was clicked`);
+                };
+
+                render() {
+                    const { title, icon } = this.props;
+
+                    return (
+                        <button>
+                            <i className={"fa-solid " + icon}></i>
+                            <span> {title} </span>
+                            <i
+                                className="fa-solid fa-caret-down"
+                                onClick={this.clickHandler}
+                            ></i>
+                        </button>
+                    );
+                }
+            }
+
+            const el = (
+                <div>
+                    <Button icon="fa-code" title="Code" x={100} />
+                    <Button icon="fa-eye" title="Unwatch" />
+                </div>
+            );
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(el);
+        </script>
+    </body>
+</html>

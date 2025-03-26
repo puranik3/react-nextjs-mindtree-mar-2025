@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Handling side-effects - useEffect</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js"></script>
+
+        <script type="text/babel">
+            // async functions ALWAYS return a Promise object
+            const getWorkshops = async (page = 1) => {
+                const response = await axios.get(
+                    `https://workshops-server.onrender.com/workshops`,
+                    {
+                        params: {
+                            _page: page
+                        }
+                    }
+                );
+
+                return response.data; // new Promise(response.data) - just illustration - constructor signature differs
+            };
+
+            // work done by the component apart from defining the UI is a side-effect
+            // side-effects MUST be executed using useEffect() hooks in function components
+            const WorkshopsList = () => {
+                const [loading, setLoading] = React.useState(true);
+                const [workshops, setWorkshops] = React.useState([]);
+                const [error, setError] = React.useState(null);
+
+                const [page, setPage] = React.useState(1);
+
+                React.useEffect(
+                    // side-effects can return undefined, or need to return a function called a cleanup function
+                    // async function returns a Promise, therefore you cannot make the side-effect function async
+                    () => {
+                        setLoading(true);
+
+                        const helper = async () => {
+                            try {
+                                const workshops = await getWorkshops(page);
+
+                                console.log(workshops);
+
+                                setWorkshops(workshops);
+                            } catch (error) {
+                                // error instanceof HttpError
+                                // error.x === xyz
+                                setError(error);
+                            } finally {
+                                setLoading(false);
+                            }
+                        };
+
+                        helper();
+
+                        // EXERCISE:
+                        // cleanup function (before an effect runs, the cleanup function returned by the previous run of this effect, runs)
+                        // return () => {
+
+                        // }
+                    },
+                    // If we give [] for the dependency array, the side-effect runs only when the components loads for the first time (appears on the screen) - the ffect does not depend on any other variable changes
+                    // [] // dependency array
+                    [  page /*, category */ ]
+                );
+
+                // another feature handled through another useEffect
+                // useEffect(
+                //     () => {
+
+                //     },
+                //     []
+                // );
+
+                const previous = () => {
+                    if( page <= 1 ) {
+                        return;
+                    }
+
+                    // If the new state depends on the current state, use the function form of the state setter to make the state change
+                    setPage(p => p - 1);
+                };
+
+                const next = () => {
+                    // if( page === numPages ) {
+                    //     return;
+                    // }
+
+                    // If the new state depends on the current state, use the function form of the state setter to make the state change
+                    setPage(p => p + 1);
+                }
+
+                return (
+                    <div className="container my-4">
+                        <h1>List of workshops</h1>
+                        <hr />
+
+                        <div className="my-4">
+                            <button className="btn btn-sm btn-primary me-2" onClick={previous} disabled={loading}>Previous</button>
+                            <button className="btn btn-sm btn-primary" onClick={next} disabled={loading}>Next</button>
+                            <div>You are viewing page {page}</div>
+                        </div>
+
+                        {loading === true && (
+                            <div className="d-flex justify-content-center">
+                                <div className="spinner-border" role="status">
+                                    <span className="visually-hidden">
+                                        Loading...
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {error !== null && loading === false && (
+                            <div class="alert alert-danger" role="alert">
+                                {error.message}
+                            </div>
+                        )}
+
+                        {
+                            error === null && loading === false && (
+                                workshops.map((w) => (
+                                    <div key={w.id}>{w.name}</div>
+                                ))
+                            )
+                        }
+                    </div>
+                );
+            };
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(<WorkshopsList />);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Redux Counter</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.js"></script>
+    </head>
+    <body>
+        <button id="btn-decrement" onclick="store.dispatch( decrement() )"> - </button>
+        <span id="value"></span>
+        <button id="btn-increment" onclick="store.dispatch( increment() )"> + </button>
+
+        <script>
+            // action types
+            const INCREMENT = "counter/increment";
+            const DECREMENT = "counter/decrement";
+
+            // action creators
+            function decrement(/*x, y, z*/) {
+                return {
+                    type: DECREMENT,
+                    // payload: {
+                    //     x: x,
+                    //     meta: {
+                    //         y,
+                    //         z
+                    //     }
+                    // }
+                };
+            }
+
+            function increment() {
+                return {
+                    type: INCREMENT
+                };
+            }
+
+            const initialState = {
+                value: 0
+            };
+
+            // store state is initialized when store is set up
+            // reducers must be "PURE function"
+                // 1. has no side effects - does not use any global variables, global functions, they do not even modify their own arguments
+                // 2. it is predictable - for the same inputs, it returns the same output
+            const counterReducer = (state = initialState, action) => {
+                // action.payload.meta.y
+                switch (action.type) {
+                    case INCREMENT:
+                        // We should not mutate the state object that is received as an argument
+                        // state.value++;
+                        // return state;
+
+                        // immutable state update - creating a new state object
+                        return {
+                            ...state,
+                            value: state.value + 1
+                        };
+                    case DECREMENT:
+                        return {
+                            ...state,
+                            value: state.value - 1
+                        };
+                    default:
+                        return state; // no change in state - the new state is same as the current state
+                }
+            };
+
+            const store = Redux.createStore(counterReducer);
+            console.log( store.getState() ); // logs the initial state - { value: 0 }
+
+            const render = () => {
+                document.getElementById("value").innerText = store.getState().value;
+            };
+
+            // Hey Redux store! Please call render function when there is any state update
+            store.subscribe(render);
+            render(); // call render once explicitly to show the initial state of 0
+        </script>
+    </body>
+</html>

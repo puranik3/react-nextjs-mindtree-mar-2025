@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSX Fundamentals</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // useState is a hooks. Hooks are a set of methods.
+            // Some other hooks - useState, useReducer, useEffect, useRef, useContext, useCallback, useMemo
+            // till React 16.7 - class components were more powerful than function components. In 16.8 hooks were introduced. Each hook adds some missing feature to function components.
+            // Hooks will throw an error if used in class components
+            // Rules for hooks
+            // 1. Used in Function components, or function called within function components (at the top-level)
+            // 2. Hooks can be called only in the top-level - cannot be used in event handlers, cannot be used in if block, for loop etc.
+            const Invoice = ({ customer, points, items }) => {
+                // useState() is used to create a state variable
+                // const curItems = arr[0]; // current items
+                // const setCurItems = arr[1]; // setter function to change the items
+                const [curItems, setCurItems] = React.useState(items);
+                console.log(curItems);
+                console.log(setCurItems);
+
+                // if(condition) {
+                //     React.useState();
+                // }
+
+                // an event handler by default gets the event object - so we define an inline event handler (in JSX), that calls this function and passes the itemas well
+                const deleteItem = (event, item) => {
+                    // React.useState(); // error - do not do this
+
+                    console.log(item);
+
+                    // alert("delete the item");
+
+                    // const newCurItems = curItems.filter(
+                    //     (it) => it !== item
+                    // );
+                    const newCurItems = curItems.filter(
+                        (it) => it.id !== item.id
+                    );
+
+                    // Hey React! Please update curItems with this new value
+                    setCurItems(newCurItems); // React will re-render the component, i.e. React runs this function again
+                };
+
+                return (
+                    <div className="my-4">
+                        <h1>Tax Invoice</h1>
+                        <hr />
+                        <div>Customer: {customer}</div>
+
+                        {points !== undefined ? (
+                            <div className="bg-info p-2">
+                                You have {points} points
+                            </div>
+                        ) : (
+                            <div className="bg-info p-2">
+                                Become a PRIME member to avail exciting
+                                discounts
+                            </div>
+                        )}
+
+                        <table className="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {curItems.map((item, idx) => (
+                                    <tr key={item.id}>
+                                        <td>{item.name}</td>
+                                        <td>{item.quantity}</td>
+                                        <td>{item.price}</td>
+                                        <td>{item.quantity * item.price}</td>
+                                        <td>
+                                            <button
+                                                className="btn btn-sm btn-danger"
+                                                onClick={(event) =>
+                                                    deleteItem(event, item)
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                );
+            };
+
+            const itemsJohn = [
+                {
+                    id: 1001,
+                    name: "Camlin Pen",
+                    price: 50,
+                    quantity: 5,
+                },
+                {
+                    id: 1002,
+                    name: "Natraj Pencils",
+                    price: 10,
+                    quantity: 30,
+                },
+                {
+                    id: 1003,
+                    name: "A4 Sheets",
+                    price: 200,
+                    quantity: 2,
+                },
+            ];
+
+            const itemsJane = [
+                ...itemsJohn,
+                {
+                    id: 1004,
+                    name: "Apsara Eraser",
+                    price: 15,
+                    quantity: 5,
+                },
+            ];
+
+            const el = (
+                <React.Fragment>
+                    <Invoice
+                        customer="John Doe"
+                        points={250}
+                        items={itemsJohn}
+                    />
+                    <Invoice customer="Jane Doe" items={itemsJane} />
+                </React.Fragment>
+            );
+
+            console.log(el);
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(<div className="container">{el}</div>);
+        </script>
+    </body>
+</html>

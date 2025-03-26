@@ -1,0 +1,59 @@
+<!-- ! + Enter -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hello React</title>
+    </head>
+    <body>
+        <!--
+            <div id="introduction" class="message">
+                <strong>React</strong>
+                 is a frontend library to create an app's UI
+            </div>
+        -->
+        <div id="root"></div>
+        <!-- First React -->
+        <!-- also used for mobile apps -->
+        <!-- Architect for the app UI -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+
+        <!-- Second ReactDOM -->
+        <!-- Specific to web apps -->
+        <!-- Builder of the UI (DOM manipulation) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+
+        <script>
+            // define the UI
+            // React element - simplified DOM node (a plain JS object)
+            const el = React.createElement(
+                // type of element
+                "div",
+
+                // props - attrs in HTML -> props in React
+                {
+                    id: "introduction",
+                    className: "message",
+                    // children : [ ... ]
+                },
+
+                // children is a special prop - if there are 2 or more children, they will be collected into an array
+                React.createElement(
+                    "strong",
+                    null, // or {}
+                    "React"
+                ),
+
+                " is a frontend library to create an app's UI"
+            );
+
+            console.log(el);
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            // DOM manipulations take place here and we see the UI
+            root.render(el);
+        </script>
+    </body>
+</html>

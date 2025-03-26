@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title></title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // Higher Order Component (class components)
+            // Design pattern for for shared logic between components
+
+            // HOC generates a class component and returns it
+            const withCounter = (Component) => {
+                return class extends React.Component {
+                    state = {
+                        value: 1,
+                    };
+
+                    previousValue = () => {
+                        this.setState(
+                            state => {
+                                return {
+                                    value: state.value - 1
+                                }
+                            }
+                        );
+                    };
+
+                    nextValue = () => {
+                        this.setState(
+                            state => {
+                                return {
+                                    value: state.value + 1
+                                }
+                            }
+                        );
+                    };
+
+                    render() {
+                        return (
+                            <Component
+                                value={this.state.value}
+                                previousValue={this.previousValue}
+                                nextValue={this.nextValue}
+                            />
+                        );
+                    }
+                };
+            };
+
+            class WorkshopsList extends React.Component {
+                state = {
+                    // value: 1,
+                    workshops: [],
+                    error: null,
+                    loading: true
+                };
+
+                // previousValue = () => {
+                //     this.setState(
+                //         state => {
+                //             return {
+                //                 value: state.value - 1
+                //             }
+                //         }
+                //     );
+                // }
+
+                // nextValue = () => {
+                //     this.setState(
+                //         state => {
+                //             return {
+                //                 value: state.value + 1
+                //             }
+                //         }
+                //     );
+                // }
+
+                render() {
+                    return (
+                        <div>
+                            <h1>List of workshops</h1>
+                            <hr />
+                            <button onClick={this.props.previousValue}>
+                                Previous
+                            </button>
+                            {this.props.value}
+                            <button onClick={this.props.nextValue}>Next</button>
+                            Lot of other functionality
+                        </div>
+                    );
+                }
+            }
+
+            class Counter extends React.Component {
+                // state = {
+                //     value: 0
+                // };
+
+                // previousValue = () => {
+                //     this.setState(
+                //         state => {
+                //             return {
+                //                 value: state.value - 1
+                //             }
+                //         }
+                //     );
+                // }
+
+                // nextValue = () => {
+                //     this.setState(
+                //         state => {
+                //             return {
+                //                 value: state.value + 1
+                //             }
+                //         }
+                //     );
+                // }
+
+                render() {
+                    return (
+                        <div>
+                            <button onClick={this.props.previousValue}>
+                                -
+                            </button>
+                            {this.props.value}
+                            <button onClick={this.props.nextValue}>+</button>
+                        </div>
+                    );
+                }
+            }
+
+            const WorkshopsListContainer = withCounter(WorkshopsList);
+            const CounterContainer = withCounter(Counter);
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(
+                <React.Fragment>
+                    <WorkshopsListContainer />
+                    <CounterContainer />
+                </React.Fragment>
+            );
+        </script>
+    </body>
+</html>

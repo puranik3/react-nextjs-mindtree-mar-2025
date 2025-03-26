@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Handling side-effects - useEffect</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js"></script>
+
+        <script type="text/babel">
+            // hook -> useReducer()
+            // useReducer() is for creating state
+            const getWorkshops = async (page = 1) => {
+                const response = await axios.get(
+                    `https://workshops-server.onrender.com/workshops`,
+                    {
+                        params: {
+                            _page: page
+                        }
+                    }
+                );
+
+                return response.data;
+            };
+
+            const FETCHING = 'FETCHING';
+            const FETCHED_WORKSHOPS = 'FETCHED_WORKSHOPS';
+            const ERROR_FETCHING_WORKSHOPS = 'ERROR_FETCHING_WORKSHOPS';
+            const PREVIOUS_PAGE = 'PREVIOUS_PAGE';
+            const NEXT_PAGE = 'NEXT_PAGE';
+
+            // Given the current state, and action (what happened in the app), reducer returns the new state
+            const workshopsReducer = (curState, action) => {
+                let newState;
+
+                switch(action.type) {
+                    case FETCHING:
+                        newState = {
+                            ...curState, // spread the curState -> copies all properties in the current state object
+                            loading: true,
+                        };
+                        break;
+                    case FETCHED_WORKSHOPS:
+                        // arr = [1, 2, 3, 4]
+                        // x = [ ...arr ] // [ 1, 2, 3, 4 ]
+                        // x[3] = 5 // [ 1, 2, 3, 5 ]
+                        newState = {
+                            ...curState, // spread the curState -> copies all properties in the current state object
+                            loading: false,
+                            workshops: action.payload.workshops
+                        };
+                        break;
+                    case ERROR_FETCHING_WORKSHOPS:
+                        newState = {
+                            ...curState, // spread the curState -> copies all properties in the current state object
+                            loading: false,
+                            workshops: action.payload.error
+                        };
+                        break;
+                    case PREVIOUS_PAGE:
+                        newState = {
+                            ...curState,
+                            page: curState.page - 1
+                        };
+                        break;
+                    case NEXT_PAGE:
+                        newState = {
+                            ...curState,
+                            page: curState.page + 1
+                        };
+                        break;
+                    default:
+                        newState = curState; // no state change
+
+                }
+
+                return newState;
+            };
+
+            const WorkshopsList = () => {
+                const [state, dispatch] = React.useReducer(
+                    workshopsReducer,
+                    {
+                        loading: true,
+                        workshops: [],
+                        error: null,
+                        page: 1
+                    }
+                );
+
+                const { loading, workshops, error, page } = state;
+
+                React.useEffect(
+                    () => {
+                        /**
+                         * action will be an object with `type` indicating what happened in the component
+                         *  {
+                                type: 'FETCHING'
+                            }
+                         *
+                         */
+                        dispatch({
+                            type: FETCHING
+                        });
+
+                        const helper = async () => {
+                            try {
+                                const workshops = await getWorkshops(page);
+                                // the extra info to be passed to the reducer is conventionally put inside payload: {}
+                                // When dispatch is called -> React will call workshopsReducer like so...
+                                // workshopsReducer(
+                                //     { // curState
+                                //         loading: true,
+                                //         workshops: [],
+                                //         error: null,
+                                //         page: 1
+                                //     },
+                                //     { // action
+                                //         type: 'FETCHED_WORKSHOPS',
+                                //         payload: {
+                                //             // workshops: workshops
+                                //             workshops
+                                //         }
+                                //     }
+                                // )
+
+                                dispatch({
+                                    type: FETCHED_WORKSHOPS,
+                                    payload: {
+                                        // workshops: workshops
+                                        workshops
+                                    }
+                                });
+                            } catch (error) {
+                                dispatch({
+                                    type: ERROR_FETCHING_WORKSHOPS,
+                                    // error: error
+                                    error
+                                });
+                            }
+                        };
+
+                        helper();
+                    },
+                    [  page ]
+                );
+
+                const previous = () => {
+                    if( page <= 1 ) {
+                        return;
+                    }
+
+                    dispatch({
+                        type: PREVIOUS_PAGE
+                    });
+                };
+
+                const next = () => {
+                    dispatch({
+                        type: NEXT_PAGE
+                    });
+                }
+
+                return (
+                    <div className="container my-4">
+                        <h1>List of workshops</h1>
+                        <hr />
+
+                        <div className="my-4">
+                            <button className="btn btn-sm btn-primary me-2" onClick={previous} disabled={loading}>Previous</button>
+                            <button className="btn btn-sm btn-primary" onClick={next} disabled={loading}>Next</button>
+                            <div>You are viewing page {page}</div>
+                        </div>
+
+                        {loading === true && (
+                            <div className="d-flex justify-content-center">
+                                <div className="spinner-border" role="status">
+                                    <span className="visually-hidden">
+                                        Loading...
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {error !== null && loading === false && (
+                            <div class="alert alert-danger" role="alert">
+                                {error.message}
+                            </div>
+                        )}
+
+                        {
+                            error === null && loading === false && (
+                                workshops.map((w) => (
+                                    <div key={w.id}>{w.name}</div>
+                                ))
+                            )
+                        }
+                    </div>
+                );
+            };
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(<WorkshopsList />);
+        </script>
+    </body>
+</html>

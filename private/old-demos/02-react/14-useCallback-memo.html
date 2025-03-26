@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+        <title>useCallback and React.memo</title>
+        <style>
+            .panel {
+                border: 1px solid #333;
+                border-radius: 4px;
+                margin: 16px;
+            }
+
+            .panel-question,
+            .panel-answer {
+                padding: 1em;
+            }
+
+            .panel-question {
+                background-color: #333;
+                color: ivory;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // import { memo, useCallback, useMemo } from 'react';
+
+            // `useMemo` is for "memoizing" calculations (like filtering os large arrays) within a component
+            // vs
+            // `React.memo()` is for preventing unnecessary re-rendering when the prop value does not change from one render to the next
+
+            const PanelQuestion = React.memo(
+                ({ question, toggle }) => {
+                    console.log('PanelQuestion::render');
+
+                    return (
+                        <div className="panel-question" onClick={toggle}>
+                            {question}
+                        </div>
+                    );
+                }
+            );
+
+            const PanelAnswer = ({ answer, show }) => {
+                console.log('PanelAnswer::render');
+
+                return show ? (
+                    <div className="panel-answer">{answer}</div>
+                ) : null;
+            };
+
+            const Panel = ({ question, answer }) => {
+                console.log('Panel::render');
+
+                const [show, setShow] = React.useState(true);
+
+                // this is a local variable pointing to a function that is created when a rendering is in progresss
+                // it is recreated for every render (both toggle variable, and the toggle function)
+                // useCallback( f ) -> then f is recreated only when the dependencies change
+                const toggle = React.useCallback(
+                    () => {
+                        setShow((s) => !s);
+                    },
+                    [setShow] // setter functions for state variables are not recreated by React. Therefore toggle function will not be recreated. So toggle variable will always point to the SAME function (i.e. in every render)
+                );
+
+                return (
+                    <div className="panel">
+                        <PanelQuestion question={question} toggle={toggle} />
+                        <PanelAnswer answer={answer} show={show} />
+                    </div>
+                );
+            };
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(
+                <div className="container my-4">
+                    <Panel
+                        question="What is React?"
+                        answer="It is a library for frontend apps"
+                    />
+                </div>
+            );
+        </script>
+    </body>
+</html>

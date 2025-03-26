@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title></title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            class ErrorBoundary extends React.Component {
+                state = {
+                    error: null
+                };
+
+                // called when a descendant throws an error and it is still not handled
+                componentDidCatch(error) {
+                    // set state to show the error message instead of the child which is throwing an error
+                    this.setState({
+                        error
+                    });
+                }
+
+                render() {
+                    const { error } = this.state;
+
+                    if(error) {
+                        return <div>{error.message}</div>
+                    }
+
+                    return this.props.children;
+                }
+            }
+
+            const SomeComponent = ({ throwError }) => {
+                if(throwError) {
+                    throw new Error('Some error occured');
+                }
+
+                return <div>I am some component</div>;
+            };
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(
+                <React.Fragment>
+                    <ErrorBoundary>
+                        <SomeComponent throwError={true} />
+                    </ErrorBoundary>
+                    <SomeComponent throwError={false} />
+                </React.Fragment>
+            );
+        </script>
+    </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Render props</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            /**
+             * render props is a design pattern - for class components
+             *
+             * used when 2 component share ALL the functionality, EXCEPT the UI
+             *
+             * Intead of these 2 components
+             * WorkshopsListGrid
+             * WorkshopsListTable
+             *
+             * Have one component - WorkshopsList
+             *
+             * <WorkshopsList render={
+             *  ( workshops ) => (
+             *        <table>....</table>
+             *  )
+             * } />
+             *
+             * <WorkshopsList render={
+             *  ( workshops ) => (
+             *        <div className="grid">....</div>
+             *  )
+             * } />
+             *
+             * Internally WorkshopsList will call the passed render function to get the UI, then it will return the UI
+             */
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(el);
+        </script>
+    </body>
+</html>

@@ -380,10 +380,6 @@ class Person implements IPerson {
     }
 }
 
-// class Person implements IPerson {}
-
-// IPerson john = new Person()
-
 const jane: Person = new Person("Jane Doe", 32, "John Doe");
 
 export {
@@ -392,7 +388,7 @@ export {
 };
 ```
 - __TAKEAWAYS__
-    - Interface can be used to type objects, and also enfore a public facing API for classes
+    - Interface can be used to type objects, and also enforce a public facing API for classes
     - They support optional and readonly property/method.
     - Interface can define property and method types
     - You can use type and interface interchangeably to define an object's type. However interfaces help define hierachies of types (by interface extension), and also support __declaration merging__.
@@ -400,12 +396,12 @@ export {
     - By convention we name the interface starting with the letter `I`.
 
 ## Step 12: Interface extension
+- A new interface can be created by extending an existing interface
 - In `src/11-interface-inheritance.ts`
 ```ts
 // default export outside braces, default export can be imported using any name
 // named export inside braces
 import IHuman, { Person as Human } from "./09-interface";
-// import IXYZ from "./some/other/file";
 
 interface IEmployee extends IHuman {
     role: string;
@@ -429,6 +425,7 @@ const john: IEmployee = {
     celebrateBirthday: function () {
         this.age++;
     },
+
     // IEmpoyee-specific
     promote: function (newRole: string) {
         this.role = newRole;
@@ -437,6 +434,9 @@ const john: IEmployee = {
 
 export {};
 ```
+- __TAKEAWAYS__
+    - The new interface adds new properties and methods to the existing (base) interface
+    - Objects typed using the new interface must thus have properties and methods from both interfaces
 
 ## Step 13: Class
 - In `src/12-class.ts`
@@ -499,6 +499,14 @@ john.addChildren("Jim Doe");
 
 export {};
 ```
+- __TAKEAWAYS__
+    - by default access modifier for property/method is public
+    - access modifier can be public, protected or private (with usual OOPS connotation)
+    - defining data member explicitly is not required in TS (actually this comes from JS)
+    - properties can be readonly, optional
+    - properties must be initialized at the time of declaration, or inside the constructor
+    - access modifier can be given along with the constructor argument - this way we can omit the property declaration and assignment inside the constructor
+    - `super(...)` is used to call the base class constructor within the derived class, and `super.method(...)` is used to call a base class method within derived class method (actually this comes from JS)
 
 ## Step 14: Motivation for Generics
 - In `src/13-generics-motivation.ts`
@@ -650,3 +658,322 @@ const months = ["January", "February", "March", "April", "May", "June"];
 const monthLengths = map(months, (m) => m.length);
 console.log(monthLengths);
 ```
+
+## Step 17: Type Narrowing
+Type narrowing in TypeScript refers to refining a **wider type** (like `string | number`) to a **more specific one** within a specific block of code using type guards — like `typeof`, `in`, or `instanceof`.
+
+### Why do we need type narrowing?
+Because TypeScript needs to **know exactly what type you're working with** to allow access to properties or methods that are specific to that type.
+
+---
+
+### Example: Type Narrowing with `typeof`
+
+```ts
+function printLengthOrFixed(value: string | number) {
+  if (typeof value === 'string') {
+    // Here, TypeScript knows 'value' is a strin
+    console.log(`String length: ${value.length}`);
+  } else {
+    // Here, TypeScript knows 'value' is a number
+    console.log(`Fixed number: ${value.toFixed(2)}`);g
+  }
+}
+```
+
+#### Breakdown:
+- `value` starts as `string | number`.
+- Inside the `if` block, `typeof value === 'string'` narrows the type to `string`.
+- In the `else`, it's implicitly narrowed to `number`.
+
+---
+
+### More Narrowing Techniques
+1. `in` keyword — good for checking property presence.
+2. `instanceof` — for class-based narrowing.
+3. Custom type guards.
+
+---
+
+### Bonus: Custom Type Guard
+
+```ts
+type Dog = { kind: 'dog'; bark: () => void };
+type Cat = { kind: 'cat'; meow: () => void };
+type Animal = Dog | Cat;
+
+function isDog(animal: Animal): animal is Dog {
+  return animal.kind === 'dog';
+}
+
+function speak(animal: Animal) {
+  if (isDog(animal)) {
+    animal.bark(); // TypeScript knows this is a Dog now
+  } else {
+    animal.meow(); // So this must be a Cat
+  }
+}
+```
+- When the function `isDog` returns `true`, TypeScript narrows the type of `animal` to `Dog`
+
+💯 Yes! That’s **exactly** a **discriminated union** 👏
+
+You're on point.
+
+---
+
+## Step 18: Discriminated union
+
+```ts
+type Dog = { kind: 'dog'; bark: () => void };
+type Cat = { kind: 'cat'; meow: () => void };
+type Animal = Dog | Cat;
+```
+
+- `Animal` is a discrimintaed union (also called a **tagged union**)
+    - You have a **union type**: `Animal = Dog | Cat`.
+    - Both types (`Dog` and `Cat`) share a **common discriminant property**: `kind`.
+    - The `kind` property has a **unique literal value** in each type (`'dog'` or `'cat'`).
+
+---
+
+### How TypeScript uses it
+
+TypeScript can now **automatically narrow** the union based on the `kind` field, without needing a custom type guard:
+
+```ts
+function speak(animal: Animal) {
+  if (animal.kind === 'dog') {
+    animal.bark(); // inferred as Dog
+  } else {
+    animal.meow(); // inferred as Cat
+  }
+}
+```
+
+TypeScript looks at `animal.kind` and uses it to figure out which branch of the union you're in.
+
+---
+
+### So... do we need `isDog()` then?
+
+Not strictly! In this case, **no** — because TypeScript can already narrow based on the `kind` field.
+
+BUT… a custom guard like `isDog()` can still be useful if:
+- You want to **encapsulate** the logic (especially if it gets complex).
+- You want to **reuse** the check across multiple places.
+- You’re working with more complex unions or partial objects where `kind` isn't guaranteed to exist.
+
+### Step 19: Utility types
+
+### Base Interface
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email?: string;
+}
+```
+
+---
+
+### `Omit<T, K>` – remove keys
+
+```ts
+type UserWithoutEmail = Omit<User, 'email'>;
+
+// Result:
+// {
+//   id: number;
+//   name: string;
+// }
+```
+
+---
+
+### `Partial<T>` – make all keys optional
+
+```ts
+type PartialUser = Partial<User>;
+
+// Result:
+// {
+//   id?: number;
+//   name?: string;
+//   email?: string;
+// }
+```
+
+---
+
+### `Pick<T, K>` – choose specific keys
+
+```ts
+type UserContact = Pick<User, 'name' | 'email'>;
+
+// Result:
+// {
+//   name: string;
+//   email?: string;
+// }
+```
+
+---
+
+### `Required<T>` – make all optional keys required
+
+```ts
+type CompleteUser = Required<User>;
+
+// Result:
+// {
+//   id: number;
+//   name: string;
+//   email: string; // now required!
+// }
+```
+
+---
+
+### Composing utility types
+__Example__: Partial<Pick<T, K>> – make only some fields optional
+
+```ts
+type OptionalNameAndEmail = Partial<Pick<User, 'name' | 'email'>>;
+
+// Result:
+// {
+//   name?: string;
+//   email?: string;
+// }
+```
+
+
+### `Record<K, T>` – build an object with specific keys and value types
+
+```ts
+type Role = 'admin' | 'guest';
+
+type RolePermissions = Record<Role, boolean>;
+
+// Result:
+// {
+//   admin: boolean;
+//   guest: boolean;
+// }
+```
+
+---
+
+## Step 20: Mapped Types
+
+The `Record` from the previous step is an example of a built-in __Mapped type__. So are __Partial__, __Required__ etc.
+
+```ts
+type Domain = 'www.google.com' | 'www.medium.com' | 'www.facebook.com';
+    
+// Step 1: Define a generic mapped type, called MyRecord, that accepts the types for keys and values as parameters - make sure to restrict the key type using "keyof any".
+// type Key = keyof any; <=> type Key = string | number | symbol; (i.e. Any valid JavaScript object key type)
+// Note: All values of this generic type will be of a single type (which is passed as a parameter)
+// We have implemented the built in "Record" type
+type MyRecord<T extends keyof any, U> = {
+    [key in T]: U
+}
+
+// Step 2: Define DNSEntries using MyRecord, and create dnsEntries object
+let dnsEntries : MyRecord<Domain, string> = {
+    'www.google.com': '123.456.789.012',
+    'www.facebook.com': '234.456',
+    'www.medium.com': '345'
+};
+```
+
+### A powerful example
+- Base Interface
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+```
+
+---
+
+#### Mapped Type: Getters and Setters
+
+```ts
+type Accessors<T> = {
+  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];
+} & {
+  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
+};
+```
+
+#### Example Usage
+
+```ts
+type UserAccessors = Accessors<User>;
+
+/* Resulting type:
+
+type UserAccessors = {
+  getId: () => number;
+  getName: () => string;
+  getEmail: () => string;
+  setId: (value: number) => void;
+  setName: (value: string) => void;
+  setEmail: (value: string) => void;
+}
+*/
+```
+
+## Step 21: Conditional Types
+
+— Pick type based on a condition
+
+```ts
+type IsString<T> = T extends string ? 'yes' : 'no';
+
+type A = IsString<string>; // 'yes'
+type B = IsString<number>; // 'no'
+```
+
+---
+
+### Realistic Example: Extract only function properties
+
+- It extracts the keys of a type where the value is a function
+```ts
+type OnlyFunctions<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never;
+}[keyof T];
+```
+
+```ts
+interface Mixed {
+  id: number;
+  name: string;
+  greet(): void;
+  update(data: string): boolean;
+}
+
+type FunctionKeys = OnlyFunctions<Mixed>; 
+// 'greet' | 'update'
+```
+
+### Use `Pick` with it:
+
+```ts
+type FunctionOnlyProps = Pick<Mixed, OnlyFunctions<Mixed>>;
+
+// Result:
+{
+  greet(): void;
+  update(data: string): boolean;
+}
+```
+
+---

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Middleware</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.js"></script>
+    </head>
+    <body>
+        <button id="btn-decrement" onclick="store.dispatch( { type: DECREMENT } )"> - </button>
+        <span id="value"></span>
+        <button id="btn-increment" onclick="store.dispatch( { type: INCREMENT } )"> + </button>
+
+        <script>
+            // action types
+            const INCREMENT = "counter/increment";
+            const DECREMENT = "counter/decrement";
+
+            const initialState = {
+                value: 0
+            };
+
+            // store state is initialized when store is set up
+            const counterReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case INCREMENT:
+                        return {
+                            ...state,
+                            value: state.value + 1
+                        };
+                    case DECREMENT:
+                        return {
+                            ...state,
+                            value: state.value - 1
+                        };
+                    default:
+                        return state; // no change in state - the new state is same as the current state
+                }
+            };
+
+            // function logger(store) {
+            //     return function(next) {
+            //         return function(action) {
+            //             //
+            //         }
+            //     }
+            // }
+
+            const logger = (store) => (next) => (action) => {
+                // This his executes BEFORE the state updates
+                console.log("Before Action:", action, store.getState()); // Current state
+
+                // pass on control
+                next(action); // Pass action to next middleware or store
+
+                // ... control comes back AFTER the state updates and execution continue
+                console.log("After Action:", action, store.getState()); // Updated state
+            };
+
+            // when action is dispatched logger is called -> x called -> y called -> z called -> sore gets the action
+            const store = Redux.createStore(counterReducer, Redux.applyMiddleware(logger/*, x, y, z */ ));
+            console.log( store.getState() ); // logs the initial state - { value: 0 }
+
+            const render = () => {
+                document.getElementById("value").innerText = store.getState().value;
+            };
+
+            // Hey Redux store! Please call render function when there is any state update
+            store.subscribe(render);
+            render(); // call render once explicitly to show the initial state of 0
+        </script>
+    </body>
+</html>

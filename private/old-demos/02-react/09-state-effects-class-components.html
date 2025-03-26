@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>State and Side-effects in class components</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js"></script>
+
+        <script type="text/babel">
+            const getWorkshops = async (page = 1) => {
+                const response = await axios.get(
+                    `https://workshops-server.onrender.com/workshops`,
+                    {
+                        params: {
+                            _page: page
+                        }
+                    }
+                );
+
+                return response.data;
+            };
+
+            class WorkshopsList extends React.Component {
+                // React.Component has a method called setState() which is used to make state changes
+                state = {
+                    loading: true,
+                    workshops: [],
+                    error: null,
+                    page: 1
+                };
+
+                // constructor(props) {
+                //     super(props);
+
+                //     this.state = {
+                //         loading: true
+                //     };
+                // }
+
+                previous = () => {
+                    if( this.state.page <= 1 ) {
+                        return;
+                    }
+
+                    // object argument of setState()
+                    // this.setState({
+                    //     page: this.state.page - 1
+                    // })
+
+                    // function argument of setState() -> use this when the new state depends on the current state
+                    this.setState(curState => {
+                        return {
+                            page: curState.page - 1
+                        };
+                    });
+                };
+
+                next = () => {
+                    // if( this.state.page === numPages ) {
+                    //     return;
+                    // }
+
+                    // If the new state depends on the current state, use the function form of the state setter to make the state change
+                    this.setState(curState => {
+                        return {
+                            page: curState.page + 1
+                        };
+                    });
+                }
+
+                render() {
+                    const { loading, workshops, error, page } = this.state;
+
+                    return (
+                        <div className="container my-4">
+                            <h1>List of workshops</h1>
+                            <hr />
+
+                            <div className="my-4">
+                                <button className="btn btn-sm btn-primary me-2" onClick={this.previous} disabled={loading}>Previous</button>
+                                <button className="btn btn-sm btn-primary" onClick={this.next} disabled={loading}>Next</button>
+                                <div>You are viewing page {page}</div>
+                            </div>
+
+                            {loading === true && (
+                                <div className="d-flex justify-content-center">
+                                    <div className="spinner-border" role="status">
+                                        <span className="visually-hidden">
+                                            Loading...
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {error !== null && loading === false && (
+                                <div class="alert alert-danger" role="alert">
+                                    {error.message}
+                                </div>
+                            )}
+
+                            {
+                                error === null && loading === false && (
+                                    workshops.map((w) => (
+                                        <div key={w.id}>{w.name}</div>
+                                    ))
+                                )
+                            }
+                        </div>
+                    )
+                }
+
+                async getWorkshops() {
+                    // In the object passed to setState() you include only the state properties you want to change - the other state properties maintain their current values
+                    this.setState({
+                        loading: true
+                    });
+
+                    try {
+                        const workshops = await getWorkshops(this.state.page);
+
+                        this.setState({
+                            loading: false,
+                            // workshops: workshops
+                            workshops
+                        });
+                    } catch (error) {
+                        this.setState({
+                            loading: false,
+                            // error: error
+                            error
+                        });
+                    }
+                }
+
+                // Is called AFTER the first render, and never again
+                // equivalent to calling useEffect and passing []
+                async componentDidMount() {
+                    this.getWorkshops();
+                }
+
+                // called when props / state changes
+                // is called AFTER second render, AFTER third render (i.e. AFTER every re-render)
+                async componentDidUpdate(prevProps, prevState) {
+                    if( prevState.page !== this.state.page) { // similar to having a dependency array in useEffect() in functon component
+                        this.getWorkshops();
+                    }
+                }
+            }
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(
+                <WorkshopsList />
+            );
+        </script>
+    </body>
+</html>

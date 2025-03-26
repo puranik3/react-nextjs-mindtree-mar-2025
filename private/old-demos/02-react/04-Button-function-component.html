@@ -1,0 +1,71 @@
+<!-- ! + Enter -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Function component</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // name should start with uppercase letter
+            // should return a React element
+            // Button is a custom component
+
+            // Attributes are used to customize elements in HTML
+            // <input type="text" />
+            // <input type="password" />
+
+            // const Button = (p) => {
+            const Button = ({ title, icon }) => {
+                // console.log(p);
+
+                // convenient variables
+                // const title = p.title;
+                // const icon = p.icon;
+                // object destructuring
+                // const { title, icon } = p;
+
+                const clickHandler = () => {
+                    alert(`Button ${title} was clicked`);
+                };
+
+                return (
+                    <button>
+                        <i className={"fa-solid " + icon}></i>
+                        <span> {title} </span>
+                        <i
+                            className="fa-solid fa-caret-down"
+                            onClick={clickHandler}
+                        ></i>
+                    </button>
+                );
+            };
+
+            // We have 2 Button elements - 2 instances of the Button component
+            // Props are used to customize elements in React
+            // The props that are passed will be gathered into an object
+            // { icon: "fa-code" }, { icon: "fa-eye" }
+            const el = (
+                <div>
+                    <Button icon="fa-code" title="Code" x={100} />
+                    <Button icon="fa-eye" title="Unwatch" />
+                </div>
+            );
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(el);
+        </script>
+    </body>
+</html>

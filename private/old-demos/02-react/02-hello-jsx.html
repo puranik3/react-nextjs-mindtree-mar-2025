@@ -1,0 +1,40 @@
+<!-- ! + Enter -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hello JSX</title>
+    </head>
+    <body>
+        <!--
+            <div id="introduction" class="message">
+                <strong>React</strong>
+                 is a frontend library to create an app's UI
+            </div>
+        -->
+        <div id="root"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+
+        <!-- Babel (in-browser compiler) for JSX -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+        <script type="text/babel">
+            // JSX has HTML syntax (with some differences). It is NOT HTML
+            const el = (
+                <div id="introduction" className="message">
+                    <strong>React</strong>
+                    is a frontend library to create an app's UI
+                </div>
+            );
+
+            console.log(el);
+
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+
+            root.render(el);
+        </script>
+    </body>
+</html>
