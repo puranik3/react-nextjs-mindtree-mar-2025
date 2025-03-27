@@ -2,7 +2,8 @@ import { Alert, Container } from "react-bootstrap";
 import { Navigate, Routes, Route } from "react-router-dom"
 // import Container from "react-bootstrap/Container";
 import Menu from "./components/common/Menu/Menu";
-import Home from './components/Home/Home';
+// import Home from './components/Home/Home';
+import HomePage from "./pages/page";
 
 import './App.scss';
 
@@ -33,7 +34,7 @@ export default function App({ title, color = 'gray' } : Props) {
 
       <Container className="my-4">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<Navigate to="/" />} />
         </Routes>
       </Container>
