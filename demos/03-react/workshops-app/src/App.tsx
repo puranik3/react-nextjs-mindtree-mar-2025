@@ -1,5 +1,9 @@
-import { Alert } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
+// import Container from "react-bootstrap/Container";
 import Menu from "./components/common/Menu/Menu";
+import Home from './components/Home/Home';
+
+import './App.scss';
 
 interface Props {
   title?: string,
@@ -25,6 +29,10 @@ export default function App({ title, color = 'gray' } : Props) {
       </Alert>
 
       <Menu />
+
+      <Container className="my-4">
+        <Home />
+      </Container>
 
       {
         /*
