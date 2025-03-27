@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 
 import 'bootstrap/scss/bootstrap.scss';
 import './index.css';
@@ -13,8 +14,10 @@ const root = ReactDOM.createRoot(
 // props -> { title: "Hello React", color: "red" }
 root.render(
   <>
-    {/* <App title="Hello React" color="red" />
-    <App title="Hello Next JS" /> */}
-    <App />
+    <BrowserRouter>
+      {/* <App title="Hello React" color="red" />
+      <App title="Hello Next JS" /> */}
+      <App />
+    </BrowserRouter>
   </>
 );
