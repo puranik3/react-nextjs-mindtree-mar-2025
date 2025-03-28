@@ -3,7 +3,7 @@ import IWorkshop from "../models/IWorkshop";
 
 const getWorkshops = async () => {
     const response = await fetch(
-        `https://workshops-server.onrender.com/workshop`
+        `https://workshops-server.onrender.com/workshops`
     );
 
     // 404, 500 etc - error response

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Row, Col } from 'react-bootstrap';
 
+import Item from './Item/Item';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import ErrorAlert from '../../common/ErrorAlert/ErrorAlert';
 import { getWorkshops } from "../../../services/workshops";
@@ -61,9 +63,17 @@ const WorkshopsList = () => {
 
             {
                 !loading && !error && (
-                    workshops.map(
-                        workshop => <div key={workshop.id}>{workshop.name}</div>
-                    )
+                    <Row xs={1} md={2} lg={3} xl={4}>
+                        {
+                            workshops.map(
+                                workshop => (
+                                    <Col className="my-3 d-flex" key={workshop.id}>
+                                        <Item {...workshop} />
+                                    </Col>
+                                )
+                            )
+                        }
+                    </Row>
                 )
             }
         </>
