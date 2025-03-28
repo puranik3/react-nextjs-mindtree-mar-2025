@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Alert, Spinner } from 'react-bootstrap';
 
-import { getWorkshops } from "../../../services/workshop";
+import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
+import ErrorAlert from '../../common/ErrorAlert/ErrorAlert';
+import { getWorkshops } from "../../../services/workshops";
 import IWorkshop from '../../../models/IWorkshop';
 
 const WorkshopsList = () => {
@@ -48,19 +49,13 @@ const WorkshopsList = () => {
 
             {
                 loading ? (
-                    <div className="text-center">
-                        <Spinner animation="border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </Spinner>
-                    </div>
+                    <LoadingSpinner />
                 ) : null
             }
 
             {
                 !loading && error && (
-                    <Alert variant="danger">
-                        {error.message}
-                    </Alert>
+                    <ErrorAlert error={error} />
                 )
             }
 
