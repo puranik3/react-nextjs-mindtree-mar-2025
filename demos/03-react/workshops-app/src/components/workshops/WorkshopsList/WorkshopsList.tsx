@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 
 import Item from './Item/Item';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
@@ -11,6 +11,7 @@ const WorkshopsList = () => {
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ error, setError ] = useState<Error | null>(null);
     const [ workshops, setWorkshops ] = useState<IWorkshop[]>([]);
+    const [ page, setPage ] = useState<number>(1);
 
     useEffect(
         // effect function - f (executes AFTER the render)
@@ -22,7 +23,7 @@ const WorkshopsList = () => {
                 setLoading( true );
 
                 try {
-                    const data = await getWorkshops();
+                    const data = await getWorkshops(page);
                     console.log( data );
                     setWorkshops( data ); // when you update state, React will re-render the component
                 } catch(error) {
@@ -41,13 +42,50 @@ const WorkshopsList = () => {
 
             // }
         },
-        [] // dependency array - f executes only when the component loads (it appears on the browser for the first time)
+        [page] // dependency array - f executes only when the component loads (it appears on the browser for the first time)
     );
+
+    const previous = (newPage: number) => {
+        if (page <= 1) {
+            return;
+        }
+
+        // when the new state depends on the current state, we use the function form of the setter
+        // setPage(newPage); // can lead to bugs
+        setPage( p => p - 1 );
+    };
+
+    const next = (newPage: number) => {
+        setPage( p => p + 1);
+    };
 
     return (
         <>
             <h1>List of Workshops</h1>
             <hr />
+
+            <div>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={
+                        !(loading === false && error === null) || page === 1
+                    }
+                    onClick={(event) => previous(page - 1)}
+                    className="me-2"
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={!(loading === false && error === null)}
+                    onClick={() => next(page + 1)}
+                >
+                    Next
+                </Button>
+                <div>You are viewing page {page}</div>
+            </div>
 
             {
                 loading ? (
