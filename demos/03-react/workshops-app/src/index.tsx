@@ -13,11 +13,11 @@ const root = ReactDOM.createRoot(
 
 // props -> { title: "Hello React", color: "red" }
 root.render(
-  <>
+  <React.StrictMode>
     <BrowserRouter>
       {/* <App title="Hello React" color="red" />
       <App title="Hello Next JS" /> */}
       <App />
     </BrowserRouter>
-  </>
+  </React.StrictMode>
 );

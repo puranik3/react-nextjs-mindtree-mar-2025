@@ -5,8 +5,6 @@ import { getWorkshops } from "../../../services/workshop";
 import IWorkshop from '../../../models/IWorkshop';
 
 const WorkshopsList = () => {
-    console.log('render');
-
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ error, setError ] = useState<Error | null>(null);
     const [ workshops, setWorkshops ] = useState<IWorkshop[]>([]);
@@ -68,7 +66,9 @@ const WorkshopsList = () => {
 
             {
                 !loading && !error && (
-                    <div>Number of workshops = {workshops.length}</div>
+                    workshops.map(
+                        workshop => <div key={workshop.id}>{workshop.name}</div>
+                    )
                 )
             }
         </>
