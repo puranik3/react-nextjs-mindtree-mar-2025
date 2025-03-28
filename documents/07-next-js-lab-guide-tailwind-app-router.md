@@ -17,7 +17,7 @@ Building Mantra Store (an online store) using the Pages Router
 
 ## References
 
--   Choose the Pages Router from the dropdown in the official Next JS documentation - https://nextjs.org/docs/getting-started/installation
+-   Choose the App Router from the dropdown in the official Next JS documentation - https://nextjs.org/docs/getting-started/installation
 -   Tailwind documentation - https://tailwindcss.com/
 
 ## Step 1: Creating the app
@@ -41,7 +41,7 @@ npx create-next-app@14 mantra-store
 ✔ Would you like to use ESLint? … No / __Yes__  
 ✔ Would you like to use Tailwind CSS? … No / __Yes__  
 ✔ Would you like your code inside a `src/` directory? … No / __Yes__  
-✔ Would you like to use App Router? (recommended) … __No__ / Yes  
+✔ Would you like to use App Router? (recommended) … No / __Yes__  
 ✔ Would you like to use Turbopack for `next dev`? … __No__ / Yes  
 ✔ Would you like to customize the import alias (`@/*` by default)? … __No__ / Yes  
 
