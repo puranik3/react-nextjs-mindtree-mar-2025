@@ -1,6 +1,6 @@
-# Building Mantra Store - A Next JS app
+# Building Mantra Store - A Next JS app (App router)
 
-Building Mantra Store (an online store) using the Pages Router
+Building Mantra Store (an online store) using the App Router
 
 -   Using TypeScript
 -   Using Tailwind CSS
@@ -55,7 +55,7 @@ cd mantra-store
 
 -   The instructor shall explain the files and folders. Make sure to understand the purpose of each file and folder.
 -   The project has the application code in `src/` folder because we chose so at project creation time (else it will not have the folder).
--   Since we are using the Pages router, the page components shall go within the `pages/` folder (for the more recent App router, the page files would be within the `app/` folder). This is one way to know which router you are working with - Pages or App router.
+-   Since we are using the App router, the page components shall go within the `app/` folder (for the older Pages router, the page files would be within the `pages/` folder). This is one way to know which router you are working with - Pages or App router.
 
 ## Step 3: Running the development server
 
@@ -72,13 +72,13 @@ npm run dev
 Add the following folders to the src/ folder. This is of course only a guidance. In an application you build at work or for pleasure, you are free to organize as you please. **But for this project please follow this structure only**.
 
 ```
-mkdir src/components src/context src/data src/pages src/services src/styles src/types
+mkdir src/components src/context src/data src/hooks src/services src/styles src/types
 ```
 
 -   **components/** - Houses the components that are not pages
 -   **context/** - Houses the context objects used for sharing data across the app
 -   **data/** - Houses the code for connecting to the backend, defining models, and DB services (methods with DB queries that shall be shared across the app)
--   **pages/** - already exists - it houses the page-level components
+-   **app/** - already exists - it houses the page-level components
 -   **services/** - Houses the API methods called by client-side code (like making API calls to fetch data, post data etc.)
 -   **styles/** - already exists - it houses the global styles
 -   **types/** - Houses the TS types (interfaces, types, classes etc.) we shall define
@@ -103,7 +103,7 @@ export default function Home() {
 }
 ```
 
--   `src/pages/index.tsx` - Edit the HomePage
+-   `src/app/page.tsx` - Edit the HomePage
 
 ```tsx
 import Home from "@/components/home/home";
@@ -119,31 +119,24 @@ export default function HomePage() {
 
 ## Step 6: Adding metadata
 
--   `src/pages/index.tsx` - Edit the HomePage to add metadata for a page like so. You shall use the Head component in future for any page you create and set appropriate metadata
+-   `src/app/page.tsx` - Edit the HomePage to add metadata for a page like so. You shall use the Head component in future for any page you create and set appropriate metadata
 
 ```tsx
-import Head from "next/head";
+import Home from "@/components/home/home";
+import type { Metadata } from "next";
 
-import Home from "@/components/home";
+export const metadata : Metadata = {
+  title: "Mantra Store",
+  description:
+    "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+};
 
 export default function HomePage() {
-    return (
-        <>
-            <Head>
-                <title>Mantra Store</title>
-                <meta
-                    name="description"
-                    content="Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep."
-                />
-            </Head>
-
-            <Home />
-        </>
-    );
+  return <Home />;
 }
 ```
 
--   `styles/globals.css` - Set up the theme for your app like so. Understand the various pieces in the code (Setting up theme color palette, font, typography). Tailwind v4 encourages a CSS-first config (e.g. via `@theme`).
+-   `app/globals.css` - Set up the theme for your app like so. Understand the various pieces in the code (Setting up theme color palette, font, typography). Tailwind v4 encourages a CSS-first config (e.g. via `@theme`).
 The `next/font/google` injects fonts via inline styles, making it harder to manage in Tailwind’s new `@theme` system.
 ```css
 @import "tailwindcss";
@@ -178,45 +171,55 @@ body {
     min-height: calc(100vh + 16px);
 }
 ```
-- In `pages/_document.tsx`
+- In `app/layout.tsx`
 ```tsx
-import { Html, Head, Main, NextScript } from "next/document";
+import type { Metadata } from "next";
 
-export default function Document() {
+/**
+ * When using Tailwind CSS v4's @theme in CSS-first config mode (introduced in v4.0) variables must reference a font-family already available in the CSS cascade — which is immediate when using <link href="https://fonts.googleapis.com/..." rel="stylesheet" />
+
+ Whereas with next/font, the fonts are injected asynchronously and scoped via class names, which doesn't align well with Tailwind's global CSS variable-based theming.
+
+ If not using Tailwind CSS v4, include font this way instead of <link />
+ */
+// import { Roboto } from "next/font/google";
+
+import "./globals.css";
+
+
+// If not using Tailwind CSS v4...
+// const roboto = Roboto({
+//   weight: ["400", "500", "700"],
+//   subsets: ["latin"],
+//   display: "swap",
+// });
+
+export const metadata: Metadata = {
+  title: "Mantra Store",
+  description: "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <Html lang="en">
-      <Head>
+    <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-      </Head>
+      </head>
+      {/* If not using Tailwind CSS v4 */}
+      {/* <body className={`${roboto.className} antialiased`}> */}
       <body className="antialiased">
-        <Main />
-        <NextScript />
+        {children}
       </body>
-    </Html>
-  );
-}
-```
-
--   `src/pages/_app.tsx` - As a good practice we shall also set up the following metadata / head elements. This is merged with the Page component Head element, and unless overriden by the page, shall be applied to the page
-
-```tsx
-import Head from "next/head";
-import type { AppProps } from "next/app";
-
-import "@/styles/globals.css";
-
-export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Component {...pageProps} />
-    </>
+    </html>
   );
 }
 ```
@@ -300,26 +303,108 @@ export default function ResponsiveAppBar() {
 -   Add the following in `src/components/layout/layout.tsx`
 
 ```tsx
-import { Fragment, ReactNode } from "react";
-
 import MainNavigation from "@/components/main-navigation/main-navigation";
+```
+```tsx
+<body className="antialiased">
+  <MainNavigation />
+  <div className="max-w-screen-xl mx-auto mt-12 px-4">
+    {children}
+  </div>
+</body>
+```
+- You get an error saying `MainNavigation` should be a __client component__ as it uses a hook - `useState`.
+- Add this as the first line in `src/components/main-navigation/main-navigation.tsx`
+```tsx
+'use client';
+```
+- Making the entire `MainNavigation` is however a blanket approach to making the menu work (by rendering it entirely in the client). In Next JS we try to "push down" client-side rendering as far down the component tree as possible. The top-level components are server components, and client components appear at the bottom level down to the leaves of the component tree. Following this approach, split the `MainNavigation` as follows
+- `src/components/main-navigation/logo/logo.tsx` (server component)
+```tsx
+import Link from "next/link";
 
-type Props = {
-    children: ReactNode;
-};
-
-function Layout({ children }: Props) {
-    return (
-        <Fragment>
-            <MainNavigation />
-            <div className="max-w-screen-xl mx-auto mt-12 px-4">
-                <main>{children}</main>
-            </div>
-        </Fragment>
-    );
+export default function Logo() {
+  return (
+    <Link href="/" className="text-xl font-bold tracking-wide uppercase hidden md:block">
+      Mantra
+    </Link>
+  );
 }
+```
+- `src/components/main-navigation/DesktopNavigation` (server component)
+```tsx
+import Link from "next/link";
 
-export default Layout;
+export default function DesktopNav() {
+  return (
+    <nav className="hidden md:flex gap-6">
+      <Link href="/products" className="hover:underline">
+        Products
+      </Link>
+      <Link href="/products/add" className="hover:underline">
+        Add a Product
+      </Link>
+    </nav>
+  );
+}
+```
+- `src/components/main-navigation/DesktopNavigation` (client component)
+```tsx
+'use client';
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function MobileMenu() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="md:hidden focus:outline-none"
+        aria-label="Toggle menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          {menuOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {menuOpen && (
+        <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
+          <Link href="/products" className="block w-full text-left hover:underline" onClick={() => setMenuOpen(false)}>
+            Products
+          </Link>
+          <Link href="/products/add" className="block w-full text-left hover:underline" onClick={() => setMenuOpen(false)}>
+            Add a Product
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
+```
+- `src/components/main-navigation/main-navigation.tsx`
+```tsx
+import Logo from "./logo/logo";
+import DesktopNav from "./desktop-navigation/desktop-navigation";
+import MobileMenu from "./mobile-navigation/mobile-navigation";
+
+export default function ResponsiveAppBar() {
+  return (
+    <header className="bg-gray-900 text-white">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        <Logo />
+        <MobileMenu />
+        <DesktopNav />
+      </div>
+    </header>
+  );
+}
 ```
 
 ### Tailwind CSS Breakdown
@@ -380,47 +465,30 @@ const AddProduct = () => {
 
 export default AddProduct;
 ```
-- `pages/products/index.tsx`
+- `app/products/page.tsx`
 ```tsx
-import Head from "next/head";
 import ProductsList from "@/components/products-list/products-list";
 
-export default function ProductsPage() {
-    return (
-        <>
-            <Head>
-                <title>List of products</title>
-                <meta
-                    name="description"
-                    content="Mantra Store - search through our variety of products."
-                />
-            </Head>
+export const metadata = {
+  title: "List of products",
+  description: "Mantra Store - search through our variety of products.",
+};
 
-            <ProductsList />
-        </>
-    );
+export default function ProductsPage() {
+  return <ProductsList />;
 }
 ```
-- `pages/products/add/index.tsx`
+- `app/products/add/page.tsx`
 ```tsx
-import Head from "next/head";
-
 import AddProduct from "@/components/add-product/add-product";
 
-export default function AddProductsPage() {
-    return (
-        <>
-            <Head>
-                <title>Add a Product</title>
-                <meta
-                    name="description"
-                    content="Mantra Store - add a new product to the store"
-                />
-            </Head>
+export const metadata = {
+  title: "Add a Product",
+  description: "Mantra Store - add a new product to the store",
+};
 
-            <AddProduct />
-        </>
-    );
+export default function AddProductsPage() {
+  return <AddProduct />;
 }
 ```
 
@@ -521,7 +589,7 @@ const itemData = [
 
 ---
 
--   Set text with different font sizes
+-   Set text with different font sizes (replace the division with the name of the store)
 
 ```tsx
 <div className="lg:col-span-1">
@@ -549,13 +617,131 @@ const itemData = [
 
 ---
 
+__Optional Step__: Fetching JSON data from a local JSON file
+- In `/public/data/products-images.json`
+```json
+[
+    {
+        "img": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+        "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops"
+    },
+    {
+        "img": "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg",
+        "title": "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
+        "title": "Camera"
+    },
+    {
+        "img": "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
+        "title": "White Gold Plated Princess"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
+        "title": "Hats"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
+        "title": "Honey"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
+        "title": "Basketball"
+    },
+    {
+        "img": "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
+        "title": "WD 2TB Elements Portable External Hard Drive - USB 3.0"
+    },
+    {
+        "img": "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
+        "title": "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s"
+    },
+    {
+        "img": "https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg",
+        "title": "Rain Jacket Women Windbreaker Striped Climbing Raincoats"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1471357674240-e1a485acb3e1",
+        "title": "Sea star"
+    },
+    {
+        "img": "https://images.unsplash.com/photo-1589118949245-7d38baf380d6",
+        "title": "Bike"
+    }
+]
+```
+- In `.env.local`
+```
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+- In `app/page.tsx`
+```tsx
+export default async function HomePage() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/data/product-images.json`, {
+    cache: 'force-cache'
+  });
+  const images = await res.json();
+
+  return <Home images={images} />;
+}
+```
+- The page component being a serve component, runs on the server. When called without any argument, `fetch` executes at build time and caches the response. It is neve called again (when individual request comes in for the home page). Instead the response cached at build time is reused. This is the equivalent of Static Site Generation (SSG) for this page, implemented using `getStaticProps()` in Pages router.
+- For SSG (Static Site Generation) in the App Router, this is fetch configuration default. So we can actually omit it from this particular call.
+```ts
+{
+  cache: 'force-cache'
+}
+```
+- Modify `components/home/home.tsx` to accept the image data as props
+```tsx
+import Image from "next/image";
+
+interface Props {
+    images: { img: string, title: string }[];
+}
+
+export default function Home( { images } : Props ) {
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-7">
+            {/* Image Grid */}
+            <div>
+                <div className="grid grid-cols-3 gap-4">
+                    {images.map((item) => (
+                        <div key={item.img} className="relative w-full h-44">
+                            <Image
+                                src={item.img}
+                                alt={item.title}
+                                fill
+                                className="object-cover rounded"
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Text Content */}
+            <div className="lg:col-span-1">
+                <h1 className="text-3xl font-semibold mb-2">Mantra</h1>
+                <h2 className="text-xl font-medium mb-6">The Honest Store</h2>
+                <p className="text-base leading-relaxed">
+                    If you cannot find what you are looking for here, it is
+                    likely not a thing! If you find it elsewhere at a lesser
+                    price, we will match the price for you!!
+                </p>
+            </div>
+        </div>
+    );
+}
+```
 
 ## Step 11: The Image component of Next JS
 
 -   When working with images we use the Image component provided by Next JS. It enables many optimizations (resizing images as per width and height props, preventing layout shifts, serving image in optimized image format based on browser, lazy loading of images etc.)
 -   Read more about it here - https://nextjs.org/docs/pages/building-your-application/optimizing/images
 
--   `next.config.mjs`- You also need to add the following to support images from external domains
+-   `next.config.ts`- You also need to add the following to support images from external domains
 
 ```ts
 const nextConfig: NextConfig = {
@@ -578,29 +764,50 @@ const nextConfig: NextConfig = {
 
 -   Observe the difference in look. Apart from this all optimizations are enabled.
 
+
 ## Step 12: Understanding Rendering models - mainly SSG
 
--   Next JS is a full-stack app. We write server-side code along with client-side code. This allows us to fetch data, and serve components that are rendered on the server-side. This rendering can happen mainly
-    -   at build-time - this is called Static Site Generation (SSG)
-    -   at request time - this is called Server-Side Rendering (SSR)
--   In fact SSG is the default rendering for Next JS pages!
--   Right click the Home page and "View page source" -> you will find rendered HTML coming from the server rather than an empty `<div id="root"></div>` like in regular client-side only React apps (like the one created using create-react-app)
--   Form the terminal run
+**Next.js (using the App Router)** enables building full-stack applications by combining server-side logic with client-side interactivity. It supports rendering components on the server as well as the client. Data fetching and component rendering can happen in the following ways:
+  - **Static Site Generation (SSG)** — Data is fetched at **build time** and the result is cached and reused. This is the default behavior when using `fetch()` without options (i.e., `cache: 'force-cache'`).
+  - **Server-Side Rendering (SSR)** — Data is fetched on **every request**. This is enabled using `fetch()` with `{ cache: 'no-store' }` or `{ next: { revalidate: 0 } }`.
+  - **React Server Components (RSC)** — Components rendered on the server **without producing client-side JavaScript**. RSCs are streamed to the browser as a serialized React tree and are **not hydrated**, making them highly efficient.
+**Important:**
+  - RSC is **not a separate rendering strategy like SSG or SSR** — it's a rendering **model**. RSC is a *component model*, not a fetch/render timing strategy. RSCs can be static (SSG), cached, or dynamic (SSR-like).
+  - In the App Router, **RSC is the default rendering model** for all components that do not include `'use client'`. 
 
+__NOTE__:
+- `getStaticProps()` (SSG), `getStaticPaths()` (SSG), `getServerSideProps()` (SSR), is part of the Pages Router API
+- In the App Router, it's replaced by:
+  - `fetch()` in Server Components (to control caching behavior and render using SSG / SSR rendering strategy)
+  - `generateStaticParams()` for dynamic static pages (equivalent of `getStaticPaths()` for SSG)
+  - `generateMetadata()` for `<head>` metadata (especially for `title`, and other `meta` information in dynamic static pages (SSG), SSR pages)
+
+-   Right click the Home page and "View page source" -> you will find rendered HTML coming from the server rather than an empty `<div id="root"></div>` like in regular client-side only React apps (like the one created using create-react-app)
+-   From the terminal run
 ```
 npm run build
 ```
+- __NOTE__: This will encounter an error if you implemented the optional step of fetching data from the public folder via the server (since the dev server may not be running). You can overcome this in one of the 2 ways below
+  - Make sure the development server is running in one terminal, and run the build from a separate terminal
+  - Use the `fs` module instead to read the JSON. Make the following changes in `app/page.tsx`
+```tsx
+import fs from "fs/promises";
+import path from "path";
+import Home from "@/components/home/home";
 
--   This creates the production build. You will see the type of rendering model applied to the pages. You will see that all pages are rendered using SSG!
--   Open the `.next` folder.
-    -   Under `.next/server/pages` you will find the assets for SSG/SSR pages, and API routing. These run only on the server (not sent to the browser).
--   Apart from this Next JS code-splits content of every page, i.e. it creates a chunk JS for every page (this is to improve initial page load time in your SPA).
--   For statically generated pages, Next.js serves pre-rendered HTML files by default.
--   When navigating between statically generated pages using client-side routing, Next.js uses client-side JavaScript to handle the navigation and loads necessary JavaScript chunks for the new page while still using the pre-rendered HTML content. It hydrates the existing static HTML content with the client-side JavaScript, allowing for interactive behavior without a full server round-trip.
-    -   These chunks can be found in the `.next/static/chunks/pages` folder.
-- Run the production build
-```
-npm start
+export const metadata = {
+  title: "Mantra Store",
+  description:
+    "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+};
+
+export default async function HomePage() {
+  const filePath = path.join(process.cwd(), "public/data/product-images.json");
+  const jsonData = await fs.readFile(filePath, "utf-8");
+  const images = JSON.parse(jsonData);
+
+  return <Home images={images} />;
+}
 ```
 
 ---
@@ -612,56 +819,22 @@ npm start
 
 --
 
-### **First Load JS shared by all **
-
-
-This output shows how **Next.js** breaks down and bundles your JavaScript during the **initial page load**, helping you understand what contributes to the client-side bundle size. This is the total JavaScript downloaded on first page load, **shared across all routes/pages**. It includes core runtime code needed by your app before any specific page logic.
-
----
-
-#### 🔹 `chunks/framework-*.js`
-
-- **Contents**: Next.js core runtime and React internals.
-- Includes:
-  - React + React DOM
-  - Next.js routing logic
-  - Core web utilities
-- Rarely changes unless React/Next version changes.
-
----
-
-#### 🔹 `chunks/main-*.js`
-
-- **Contents**: Custom app logic that's universal to all pages.
-- Includes:
-  - Your `_app.tsx` and `_document.tsx`
-  - Global styles
-  - Polyfills
-- Changes if you modify app-wide layout or global features.
-
----
-
-#### 🔹 Other shared chunks
-
-- **Contents**: Smaller shared utilities or libraries extracted from your code.
-- Might include:
-  - Tailwind setup logic
-  - Custom utility functions
-  - Shared components imported by multiple pages
-
----
-
-### Why This Matters
-
-- Smaller chunks = faster initial load.
-- You want to **minimize the `main` chunk** by code-splitting non-critical logic into lazy-loaded modules or components.
-
-You can visualize the chunks using `next build --analyze`
+-   This creates the production build. You will see the type of rendering model applied to the pages. You will see that all pages are rendered using SSG right now (the default when `fetch` is not used in components, or used with default options).
+-   Open the `.next` folder.
+    -   Under `.next/server/pages` you will find the assets for SSG/SSR pages, and API routing. These run only on the server (not sent to the browser).
+-   Apart from this Next JS code-splits content of every page, i.e. it creates a chunk JS for every page (this is to improve initial page load time in your SPA).
+-   For statically generated pages, Next.js serves pre-rendered HTML files by default.
+-   When navigating between statically generated pages (all components in Pages router, and client components only in App router) using client-side routing, Next.js uses client-side JavaScript to handle the navigation and loads necessary JavaScript chunks for the new page while still using the pre-rendered HTML content. It hydrates the existing static HTML content with the client-side JavaScript, allowing for interactive behavior without a full server round-trip.
+    -   These chunks can be found in the `.next/static/chunks/pages` folder.
+- Run the production build. You should notice a perceptible difference in the app's responsiveness when you navigate bwteen pages.
+```
+npm start
+```
 
 ## Step 13: Product List page - Setting up server-side code to connect to the DB and fetch products data, to render it using SSG
 
 -   For the product list page to be rendered using at build time (SSG), we need to be able to fetch data from the DB - i.e. we need to set up the server-side logic that connects to the DB, and queries the DB.
--   `.env` - Set up DB related variables. Some of these environment variables would probably not be used, and may be deleted - we will mainly use DATABASE_CONNECTION_STRING.
+-   `.env.local` - Set up DB related variables. Some of these environment variables would probably not be used, and may be deleted - we will mainly use DATABASE_CONNECTION_STRING.
 
 ```
 NODE_ENV=production
@@ -889,61 +1062,83 @@ export const getProducts = async (page: number = 1) => {
 
 ## Step 16: Fetch data for the Products List page at build time (SSG), and render it at build time
 
--   Make sure you understand the following code well, especially `getStaticProps()`, and when and where the code runs.
+-   Make sure you understand the following code well, especially how it gets created at build time (especially when we run `npm run build`)
     -   Understand how the data it generates is passed as props for the component.
     -   **NOTE**: During client-side navigation to this page, getStaticProps() does not execute again by default. Instead, the previously generated static page with its associated data is served from the cache.
         -   You can regenerate this data periodically using the `revalidate` option passed in the returned object (in addition to props option).
--   `src/pages/products/index.tsx`
+-   `src/app/products/page.tsx`
 
 ```tsx
-import Head from "next/head";
+import type { Metadata } from "next";
+// import { notFound } from "next/navigation";
+
 import ProductsList from "@/components/products-list/products-list";
-
 import { getProducts } from "@/data/services/products";
-import { IProduct } from "@/types/Product";
+import type { IProduct } from "@/types/Product";
 
-type Props = {
-    count: number;
-    page: number;
-    products: IProduct[];
+export const metadata: Metadata = {
+  title: "List of products",
+  description: "Mantra Store - search through our variety of products.",
 };
 
-export default function ProductsPage({ count, page, products }: Props) {
-    return (
-        <>
-            <Head>
-                <title>List of products</title>
-                <meta
-                    name="description"
-                    content="Mantra Store - search through our variety of products."
-                />
-            </Head>
+export default async function ProductsPage() {
+  try {
+    const { count, page, products }: {
+      count: number;
+      page: number;
+      products: IProduct[];
+    } = await getProducts();
 
-            <ProductsList products={products} count={count} page={page} />
-        </>
-    );
+    return <ProductsList products={products} count={count} page={page} />;
+  } catch (error) {
+    // console.error("Failed to load products:", (error as Error).message);
+    // Option 1: Render a fallback UI - Graceful Fallback UI that shows up on /products route in the client
+    // return <div>Failed to load products. Please try again later.</div>;
+
+    // Option 2: Interrupts rendering and bubbles up to error boundaries
+    // go to the closest `error.tsx` boundary (or the root one) - Error page gets access to the error and reset method to retry page rendering and is a client component
+    throw new Error("Failed to load products. Please try again later.");
+    
+    // Option 3
+    // trigger the /app/not-found.tsx route (if defined) - Not Found page does not get access to the error and is a server component
+    // notFound(); // if you want to mimic `return { notFound: true }`
+  }
+}
+```
+
+-  `app/products/error.tsx` (alternatively you can create `app/error.tsx` for making this available to every page in the application)
+```tsx
+'use client';
+
+// The error object passed by Next.js often includes a digest (a hashed error signature for debugging)
+interface Props {
+    error: Error & { digest?: string };
+    reset: () => void;
 }
 
-// runs at build time on the server
-export const getStaticProps = async () => {
-    try {
-        const { count, page, products } = await getProducts();
+export default function Error({ error, reset }: Props) {
+  console.error("Page error:", error);
 
-        return {
-            props: {
-                count,
-                page,
-                products,
-            },
-        };
-    } catch (error) {
-        console.log( (error as Error).message );
+  return (
+    <div>
+      <h2>Something went wrong.</h2>
+      <p>{error.message}</p>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
 
-        return {
-            notFound: true,
-        };
-    }
-};
+- Alternatively, if you called `notFound()` (option 3), you can create a `app/products/not-found.tsx` (you can create `app/not-found.tsx` for making this available to every page in the application)
+```tsx
+export default function NotFoundPage() {
+  return (
+    <div>
+      <h1>Products not found</h1>
+      <p>We couldn't load the product list. Please try again later.</p>
+    </div>
+  );
+}
 ```
 
 -   `src/components/products-list/products-list.tsx` - update it to accept the data and render it
@@ -1096,9 +1291,9 @@ export default ProductListItem
 ## Step 17: Set up API route to fetch products page-by-page from the client-side
 
 -   We shall set up pagination on the client-side. For that however, our backend must expose relevant APIs to the frontend.
--   APIs are set up in the `src/pages/api` folder
+-   APIs are set up in the `src/app/api` folder
 -   Such code is server-side code. The methods we shall set up will receive HTTP requests and send HTTP responses.
--   Routing setup for APIs (`src/pages/api/` folder) works the same way as client-side pages routing.
+-   Routing setup for APIs (`src/app/api/` folder) works the same way as client-side pages routing (except we use `route.ts` instead of `page.tsx`)
 -   `src/types/api` - Set up the types `IApiResponse`, `IErrorMessage`
 
 ```ts
@@ -1110,57 +1305,59 @@ export interface IApiResponse<Message> {
 export type IErrorMessage = IApiResponse<string>;
 ```
 
--   `src/pages/api/products` - Set up the requests handler like so
+-   `src/app/api/products/route.ts` - Set up the requests handler like so
 
 ```ts
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { IProduct } from "@/types/Product";
 import { IApiResponse, IErrorMessage } from "@/types/api";
 import { getProducts } from "@/data/services/products";
 
-const handler: NextApiHandler = async (
-    req: NextApiRequest,
-    res: NextApiResponse<
-        | IApiResponse<
-              IProduct | { count: number; page: number; products: IProduct[] }
-          >
-        | IErrorMessage
-    >
-) => {
-    const { method } = req;
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const pageParam = searchParams.get("page");
+    const page = pageParam ? Number(pageParam) : 1;
 
-    switch (method) {
-        case "GET":
-            try {
-                const page = req.query.page ? +req.query.page : 1;
-                const {
-                    count,
-                    page: inferredPage,
-                    products,
-                } = await getProducts(page);
-                return res.status(200).json({
-                    status: "success",
-                    message: {
-                        count,
-                        page: inferredPage,
-                        products,
-                    },
-                });
-            } catch (error) {
-                return res.status(500).json({
-                    status: "error",
-                    message: (error as Error).message,
-                });
-            }
-        default:
-            return res.status(405).json({
-                status: "error",
-                message: `METHOD=${method} not allowed`,
-            });
-    }
-};
+    const {
+      count,
+      page: inferredPage,
+      products,
+    } = await getProducts(page);
 
-export default handler;
+    const json: IApiResponse<{
+      count: number;
+      page: number;
+      products: IProduct[];
+    }> = {
+      status: "success",
+      message: {
+        count,
+        page: inferredPage,
+        products,
+      },
+    };
+
+    return NextResponse.json(json);
+  } catch (error) {
+    const err: IErrorMessage = {
+      status: "error",
+      message: (error as Error).message,
+    };
+    return NextResponse.json(err, { status: 500 });
+  }
+}
+
+export async function POST() {
+  return NextResponse.json(
+    {
+      status: "error",
+      message: "METHOD=POST not allowed",
+    } satisfies IErrorMessage,
+    { status: 405 }
+  );
+}
 ```
 
 -   Test the `/api/products` API out with Postman or your browser
@@ -1182,7 +1379,10 @@ type IGetProductsResponse = {
 }
 
 export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
-  const res = await fetch(`/api/products?page=${page}`)
+  // const res = await fetch(`/api/products?page=${page}`)
+  
+  // NOTE: process.env.NEXT_PUBLIC_SITE_URL -> Needs dev server to be running during build to work. Work around @todo -> SSG in `app/products/page.tsx` needs to fetch from DB service rather than this frontend API service, but yet construct cached response for frontend in this response format - i.e. { status: 'success', message: { count, page, products } }
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products?page=${page}`)
 
   if (!res.ok) {
     throw new Error("Failed to fetch products")
@@ -1196,6 +1396,8 @@ export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
 -   `src/components/products-list/products-list.tsx` - Add support for client-side pagination. We also handle loading state, and show errors in a Snackbar. Most of the Snackbar code is taken from an example on the component in the MUI documentation.
 
 ```tsx
+'use client';
+
 import { useEffect, useState } from "react"
 import { IProduct } from "@/types/Product"
 import ProductListItem from "./item/item"
@@ -1312,102 +1514,159 @@ const ProductsList = ({ count, page, products }: Props) => {
 export default ProductsList
 ```
 
-### Optional improvement: Cching data using TanStack Query
+### Optional improvement: Caching data using TanStack Query
 You can use __Tanstack Query__ aka __React Query__ to cache data fetched on the client-side
 ```
 npm i @tanstack/react-query
 ```
-- In `src/pages/products/index.tsx`, wrap getProducts() with React Query in `getStaticProps` - This allows the initial request to be cached and reused by React Query on the client. Then add `dehydratedState` to the returned props. This will help hydrate the TanStack Query cache on the client side in the next step we do. Note that you are no longer using the data services - you are using the same API services as used in the client-side (`@/services/products`)
+- In `src/components/lib/react-query/hydrate-client.tsx`
 ```tsx
-import Head from "next/head"
-import ProductsList from "@/components/products-list/products-list"
+'use client';
 
-import { getProducts } from "@/services/products"
-import { IProduct } from "@/types/Product"
+import { HydrationBoundary, HydrationBoundaryProps } from '@tanstack/react-query';
 
-import { GetStaticProps } from "next"
-import { QueryClient, dehydrate } from "@tanstack/react-query"
+type Props = HydrationBoundaryProps & {
+  children: React.ReactNode;
+};
 
-type Props = {
-  count: number
-  page: number
-  products: IProduct[]
+export default function HydrateClient({ children, ...props }: Props) {
+  return <HydrationBoundary {...props}>{children}</HydrationBoundary>;
 }
+```
+- In `src/app/products/page.tsx`, wrap `getProducts()` with React Query - This allows the initial request to be cached and reused by React Query on the client. Then add `dehydratedState` to the returned props. This will help hydrate the TanStack Query cache on the client side in the next step we do. Note that you are no longer using the data services - you are using the same API services as used in the client-side (`@/services/products`)
+- __TODO__: Check if this works at build-time if dev server is NOT running, as it hits client-side API service.
+```tsx
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import HydrateClient from "@/components/lib/react-query/hydrate-client";
+import ProductsList from "@/components/products-list/products-list";
+import { getProducts } from "@/services/products";
+import type { Metadata } from "next";
+import type { IProduct } from "@/types/Product";
 
-export default function ProductsPage({ count, page, products }: Props) {
-  return (
-    <>
-      <Head>
-        <title>List of products</title>
-        <meta
-          name="description"
-          content="Mantra Store - search through our variety of products."
-        />
-      </Head>
+export const metadata: Metadata = {
+  title: "List of products",
+  description: "Mantra Store - search through our variety of products.",
+};
 
-      <ProductsList products={products} count={count} page={page} />
-    </>
-  )
-}
-
-// SSG with React Query hydration
-export const getStaticProps: GetStaticProps = async () => {
+export default async function ProductsPage() {
   try {
-    const queryClient = new QueryClient()
+    // SSG with React Query hydration
+    const queryClient = new QueryClient();
 
     // Preload the page=1 data into React Query's cache
     await queryClient.prefetchQuery({
       queryKey: ["products", 1],
       queryFn: () => getProducts(1),
-    })
+    });
 
     const {
-      message: { products, count, page },
-    } = await getProducts(1)
+      products, count, page
+    } = await getProducts(1);
 
-    return {
-      props: {
-        products,
-        count,
-        page,
-        dehydratedState: dehydrate(queryClient),
-      },
-      revalidate: 60, // Optional ISR: re-generate page every 60 seconds
-    }
+    const dehydratedState = dehydrate(queryClient);
+
+    return (
+      <HydrateClient state={dehydratedState}>
+        <ProductsList products={products} count={count} page={page} />
+      </HydrateClient>
+    );
   } catch (error) {
-    console.error("ERROR: 101" +  (error as Error).message)
-
-    return {
-      notFound: true,
-    }
+    throw new Error("Failed to load products. Please try again later.");
   }
 }
 ```
-- In `src/pages/_app.tsx`
+- In `src/app/layout.tsx` we could then set up the app for rehydrating the cached products data on the client side this way...
 ```tsx
-import Head from "next/head";
-import type { AppProps } from "next/app";
-import Layout from "@/components/layout/layout";
-import { QueryClient, QueryClientProvider, HydrationBoundary } from "@tanstack/react-query"
-import { useState } from "react"
+'use client';
 
-import "@/styles/globals.css";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode, useState } from 'react';
+```
+```tsx
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  const [queryClient] = useState(() => new QueryClient());
 
-export default function App({ Component, pageProps }: AppProps) {
-  const [queryClient] = useState(() => new QueryClient())
+  return (
+    <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      {/* If not using Tailwind CSS v4 */}
+      {/* <body className={`${roboto.className} antialiased`}> */}
+      <body className="antialiased">
+        <QueryClientProvider client={queryClient}>
+          <MainNavigation />
+          <div className="max-w-screen-xl mx-auto mt-12 px-4">
+            {children}
+          </div>
+        </QueryClientProvider>
+      </body>
+    </html>
+  );
+}
+```
+- __IMPORTANT__: Wrapping part of your app in a client component is fine, but making your `RootLayout` a client component forces everything below it to hydrate (makes everything within a client component)
+- Since it is a bad idea to make `RootLayout` a client component, we implement the hydration setup differently.
+- In `src/components/lib/providers/providers.tsx`
+```tsx
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode, useState } from 'react';
+
+export default function Providers({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
-      <HydrationBoundary state={pageProps.dehydratedState}>
-        <Layout>
-          <Head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link rel="icon" href="/favicon.ico" />
-          </Head>
-          <Component {...pageProps} />
-        </Layout>
-      </HydrationBoundary>
+      {children}
     </QueryClientProvider>
+  );
+}
+```
+- In `app/layout.tsx`
+```tsx
+// IMPORTANT: No more a client component
+// 'use client';
+
+import { ReactNode } from 'react';
+import type { Metadata } from "next";
+import MainNavigation from "@/components/main-navigation/main-navigation";
+// This instead is a client component
+import Providers from '@/components/lib/providers/providers';
+```
+```tsx
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      {/* If not using Tailwind CSS v4 */}
+      {/* <body className={`${roboto.className} antialiased`}> */}
+      <body className="antialiased">
+        <Providers>
+          <MainNavigation />
+          <div className="max-w-screen-xl mx-auto mt-12 px-4">
+            {children}
+          </div>
+        </Providers>
+      </body>
+    </html>
   );
 }
 ```
@@ -1429,6 +1688,8 @@ export const useProducts = (page: number = 1) => {
     - Switches to React Query fetching for subsequent page changes.
     - Avoids flickering or redundant fetch on initial page load.
 ```tsx
+'use client';
+
 import { useEffect, useState } from "react"
 import { useProducts } from "@/hooks/useProducts"
 import { IProduct } from "@/types/Product"
@@ -1444,6 +1705,7 @@ const ProductsList = ({ count, page, products }: Props) => {
   const [actualPage, setActualPage] = useState(page)
   const [actualProducts, setActualProducts] = useState(products)
   const [actualCount, setActualCount] = useState(count)
+  const [showError, setShowError] = useState(false)
 
   const { data, isLoading, error } = useProducts(actualPage)
 
@@ -1491,10 +1753,24 @@ const ProductsList = ({ count, page, products }: Props) => {
       )}
 
       {/* Error Snackbar */}
-      {error && (
+      {showError && error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 max-w-xl mx-auto">
           <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{(error as Error).message}</span>
+          <span className="block sm:inline">{error.message}</span>
+          <button
+            onClick={() => setShowError(false)}
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+          >
+            <svg
+              className="fill-current h-6 w-6 text-red-700"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <title>Close</title>
+              <path d="M14.348 5.652a1 1 0 10-1.414-1.414L10 7.172 7.066 4.238a1 1 0 00-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 001.414 1.414L10 12.828l2.934 2.934a1 1 0 001.414-1.414L11.414 10l2.934-2.934z" />
+            </svg>
+          </button>
         </div>
       )}
 
@@ -1515,64 +1791,66 @@ const ProductsList = ({ count, page, products }: Props) => {
 export default ProductsList
 ```
 
-__NOTE__: @todo - When navigating back to page 1, the API call does not go out now. It happens because `actualPage` is `1` when we navigate back to page `1`. Now the condition within the effect function ends up preventing the API call. To overcome this we can use a ref to track the first render
+- Now the duplicate fetching of products is prevented after the list renders for the first time on the client (keep the network tab open on page load and check for outgoing requests).
+
+__NOTE__: When navigating back to page 1, the API call does not go out now. It happens because `actualPage` is `1` when we navigate back to page `1`. Now the condition within the effect function ends up preventing the API call. To overcome this we can use a ref to track the first render.
 ```tsx
 import { useEffect, useState, useRef } from "react"
 ```
 ```tsx
 const initialRender = useRef(true);
 
-useEffect(() => {
-if ((!initialRender.current || actualPage !== page) && data?.message) {
-    setActualProducts(data.message.products)
-    setActualCount(data.message.count)
-}
+useEffect(
+  () => {
+    if ((!initialRender.current || actualPage !== page) && data?.message) {
+        setActualProducts(data.message.products)
+        setActualCount(data.message.count)
+    }
 
-initialRender.current = false;
-}, [actualPage, data, page])
+    initialRender.current = false;
+  },
+  [actualPage, data, page]
+)
 ```
+- Check the network tab - you will see that once you visit a page, the network request to fetch data does not go out when you visit the page once again. TanStack Query's caching at work!
 
 ### Optional improvement:  Sync actualPage to the URL (query params) for deep linking and SEO
 - In `src/components/products-list/products-list.tsx`
 ```tsx
-import { useRouter } from "next/router"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 ```
 - Extract page parameter and set `actualPage` based on it
 ```tsx
-const router = useRouter()
+const router = useRouter();
+const searchParams = useSearchParams();
 
-const pageParam = router.query.page
+const pageParam = searchParams.get('page');
 const actualPage = useMemo(() => {
-  const num = parseInt(typeof pageParam === "string" ? pageParam : "1", 10)
-  return isNaN(num) ? 1 : num
-}, [pageParam])
+  const num = parseInt(pageParam ?? '1', 10);
+  return isNaN(num) ? 1 : num;
+}, [pageParam]);
 ```
 - Update URL query param on page change
 ```tsx
 const updatePage = (newPage: number) => {
-  router.push(
-    {
-      pathname: router.pathname,
-      query: { ...router.query, page: newPage },
-    },
-    undefined,
-    { shallow: true }
-  )
-}
+  const newParams = new URLSearchParams(searchParams.toString());
+  newParams.set('page', String(newPage));
+  router.push(`?${newParams.toString()}`);
+};
 ```
 - Update the pagination handling
 ```tsx
 <button
-    key={pageNumber}
-    onClick={() => updatePage(pageNumber)}
-    className={`px-4 py-2 border text-sm ${
-        actualPage === pageNumber
-        ? "bg-blue-600 text-white border-blue-600"
-        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-    }`}
+  key={pageNumber}
+  onClick={() => updatePage(pageNumber)}
+  className={`px-4 py-2 border text-sm ${
+    actualPage === pageNumber
+      ? 'bg-blue-600 text-white border-blue-600'
+      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+  }`}
 >
-    {pageNumber}
+  {pageNumber}
 </button>
 ```
 
