@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Alert, Container } from "react-bootstrap";
 import { Navigate, Routes, Route } from "react-router-dom";
 // import Container from "react-bootstrap/Container";
@@ -8,8 +9,11 @@ import WorkshopsListPage from "./pages/workshops/page";
 import AddWorkshopPage from "./pages/workshops/add/page";
 import FavoritesPage from "./pages/workshops/favorites/page";
 import NotFoundPage from "./pages/not-found";
+import { ThemeContext } from "./contexts/ThemeContext";
+import type { Theme } from "./contexts/ThemeContext";
 
 import "./App.scss";
+import WorkshopDetailsPage from "./pages/workshops/[id]/page";
 
 interface Props {
     title?: string;
@@ -19,8 +23,18 @@ interface Props {
 export default function App({ title, color = "gray" }: Props) {
     console.log(title, color);
 
+    const [theme, setTheme] = useState<Theme>('light');
+    const toggleTheme = () => {
+        setTheme(t => t === 'light' ? 'dark' : 'light')
+    };
+
+    const value = {
+        theme,
+        toggleTheme
+    };
+
     return (
-        <>
+        <ThemeContext.Provider value={value}>
             <Alert
                 variant="warning"
                 onClose={() => alert("The alert was closed")}
@@ -49,6 +63,7 @@ export default function App({ title, color = "gray" }: Props) {
                         path="/workshops/favorites"
                         element={<FavoritesPage />}
                     />
+                    <Route path="/workshops/:id/*" element={<WorkshopDetailsPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Container>
@@ -58,7 +73,7 @@ export default function App({ title, color = "gray" }: Props) {
           backgroundColor: color
         }}>{title}</button>
         */}
-        </>
+        </ThemeContext.Provider>
     );
 }
 

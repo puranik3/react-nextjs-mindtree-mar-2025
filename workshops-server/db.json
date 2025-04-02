@@ -608,6 +608,46 @@
       "upvoteCount": 0,
       "createdDate": "Mar 10, 2025",
       "id": 48
+    },
+    {
+      "createdDate": "Apr 01, 2025",
+      "id": 49
+    },
+    {
+      "createdDate": "Apr 01, 2025",
+      "id": 50
+    },
+    {
+      "createdDate": "Apr 01, 2025",
+      "id": 51
+    },
+    {
+      "createdDate": "Apr 01, 2025",
+      "id": 52
+    },
+    {
+      "workshopId": 3,
+      "upvoteCount": 0,
+      "sequenceId": 123,
+      "name": "MongoDB session",
+      "speaker": "John",
+      "duration": 1,
+      "level": "Basic",
+      "abstract": "SOme session",
+      "createdDate": "Apr 01, 2025",
+      "id": 53
+    },
+    {
+      "workshopId": 3,
+      "upvoteCount": 0,
+      "sequenceId": 123,
+      "name": "New session in MongoDB sharding",
+      "speaker": "John Doe",
+      "duration": 1.5,
+      "level": "Advanced",
+      "abstract": "New session in Sharding",
+      "createdDate": "Apr 01, 2025",
+      "id": 54
     }
   ],
   "users": [
