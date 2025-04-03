@@ -13,10 +13,22 @@ export const metadata : Metadata = {
     "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+    // this runs on the server side (this is a server component)
+    // Next JS has a modified fetch() API
+    // It by defaults, caches the result of the fetch call
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL}/data/product-images.json`,
+        {
+            cache: 'force-cache'
+        }
+    );
+
+    const images = await res.json();
+
     return (
         <>
-            <Home />
+            <Home images={images} />
         </>
     );
 }
