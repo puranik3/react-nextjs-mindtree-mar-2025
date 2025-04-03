@@ -15,12 +15,12 @@ export const metadata : Metadata = {
 
 export default async function HomePage() {
     // this runs on the server side (this is a server component)
-    // Next JS has a modified fetch() API
+    // Next JS has a modified fetch() API for the server side
     // It by defaults, caches the result of the fetch call
     const res = await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL}/data/product-images.json`,
         {
-            cache: 'force-cache'
+            cache: 'no-store'
         }
     );
 
