@@ -331,11 +331,11 @@ export default function Logo() {
   );
 }
 ```
-- `src/components/main-navigation/DesktopNavigation` (server component)
+- `src/components/main-navigation/desktop-navigation/desktop-navigation.tsx` (server component)
 ```tsx
 import Link from "next/link";
 
-export default function DesktopNav() {
+export default function DesktopNavigation() {
   return (
     <nav className="hidden md:flex gap-6">
       <Link href="/products" className="hover:underline">
@@ -348,14 +348,14 @@ export default function DesktopNav() {
   );
 }
 ```
-- `src/components/main-navigation/DesktopNavigation` (client component)
+- `src/components/main-navigation/mobile-navigation/mobile-navigation.tsx` (client component)
 ```tsx
 'use client';
 
 import { useState } from "react";
 import Link from "next/link";
 
-export default function MobileMenu() {
+export default function MobileNavigation() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -391,21 +391,22 @@ export default function MobileMenu() {
 - `src/components/main-navigation/main-navigation.tsx`
 ```tsx
 import Logo from "./logo/logo";
-import DesktopNav from "./desktop-navigation/desktop-navigation";
-import MobileMenu from "./mobile-navigation/mobile-navigation";
+import DesktopNavigation from "./desktop-navigation/desktop-navigation";
+import MobileNavigation from "./mobile-navigation/mobile-navigation";
 
 export default function ResponsiveAppBar() {
   return (
     <header className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <Logo />
-        <MobileMenu />
-        <DesktopNav />
+        <MobileNavigation />
+        <DesktopNavigation />
       </div>
     </header>
   );
 }
 ```
+- View page source. The HTML contains home and navigation HTML. Even client components are rendered on the server, but they will become interactive (i.e. hydrated) on the client.
 
 ### Tailwind CSS Breakdown
 
@@ -416,33 +417,11 @@ export default function ResponsiveAppBar() {
 
 ---
 
--   `src/pages/_app.tsx` - Now wrap the page rendering within Layout
-
-```tsx
-// some imports above...
-import Layout from "@/components/layout/layout";
-
-function App(props: AppProps) {
-    const { Component, pageProps } = props;
-    return (
-        <Layout>
-            <Head>
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <Component {...pageProps} />
-        </Layout>
-    );
-}
-
-export default App;
-```
-
 ## Step 9: Set up pages and components for /products and /products/add
 
 -   Go ahead and set up page components and their corresponding components (ProductsList and AddProduct) for the 2 routes - /products and /products/add
 -   This is left as an exercise. Make sure to set up appropriate metadata as well for the pages.
--   Confirm your implementation with the instructor  
+-   Confirm your implementation with the instructor
 
 __Solution__
 - `components/products-list/products-list.tsx`
@@ -1858,14 +1837,14 @@ __NOTE__: Right now, the backend is not handling query string parameters and the
 
 ## Step 19: Create the Product Details page
 
--   `src/pages/products/[id]/index.tsx` (`ProductDetailsPage`) - This defines the `/products/[id]` route where `[id]` is a placeholder for any product's id. Note that we can also create it as `[id].tsx` if we do not plan to have any paths building on this one.
+-   `src/app/products/[id]/page.tsx` (`ProductDetailsPage`) - This defines the `/products/[id]` route where `[id]` is a placeholder for any product's id.
 -   This component shall also render at build time (SSG), and hence needs the product details.
 -   `src/data/services/products.ts` - Define the service method to get a product's details
 
 ```ts
 export const getProductById = async (_id: string) => {
     const product = await Product.findById(_id);
-    const serializedProductReviews = product.reviews.map((review: any) => {
+    const serializedProductReviews = product.reviews.map((review) => {
         return {
             ...review.toJSON({ flattenObjectIds: true }),
             date: review.date.toString(),
@@ -1928,198 +1907,210 @@ const ProductDetail = ({ productId, product }: Props) => {
 export default ProductDetail
 ```
 
--   `src/pages/products/[id]/index.tsx` - The page component. Note the comment on `useRouter()` hook, and the usage of `params` argument passed to `getStaticProps()` to get the value of the dynamic params (`id`). Also note the usage of `revalidate` prop to periodically regenerate this SSG page (every 60 seconds).
-
+-   `src/app/products/[id]/page.tsx` - We fetch from the DB directly instead of using `fetch()`
 ```tsx
-import Head from "next/head";
-import { GetStaticPropsContext } from "next";
-
-import ProductDetail from "@/components/product-detail/product-detail";
-import { getProductById } from "@/data/services/products";
-import { IProduct } from "@/types/Product";
-
-// import { useRouter } from 'next/router';
+import { getProductById, getProductIds } from '@/data/services/products';
+import ProductDetail from '@/components/product-detail/product-detail';
+import type { IProduct } from '@/types/Product';
+import type { Metadata } from 'next';
 
 type Props = {
-    id: string;
-    product: IProduct;
+  params: { id: string };
 };
 
-const ProductDetailPage = ({ id, product }: Props) => {
-    // NOTE: The useRouter() hook can be used to get params information on the client-side. We shall use this in future.
-    // const router = useRouter();
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductById(id);
 
-    // console.log(router.pathname);
-    // console.log(router.query);
+  return {
+    title: product?.title ?? 'Product details',
+    description: product?.description ?? '',
+  };
+}
 
-    // const id = router.query.id as string;
+export default async function ProductDetailPage({ params }: Props) {
+  const { id } = await params;
 
-    return (
-        <>
-            <Head>
-                <title>{product?.title || "Product details"}</title>
-                <meta name="description" content={product?.description || ""} />
-            </Head>
-            <ProductDetail productId={id} product={product} />
-        </>
-    );
-};
+  const product: IProduct = (await getProductById(id));
 
-export const getStaticProps = async (
-    context: GetStaticPropsContext<{ id: string }>
-) => {
-    const { params } = context;
-    const id = params?.id as string;
-
-    return {
-        props: {
-            id: id,
-            product: await getProductById(id),
-        },
-        revalidate: 60,
-    };
-};
-
-export default ProductDetailPage;
+  return (
+    <ProductDetail
+      productId={id}
+      product={product}
+    />
+  );
+}
 ```
 
--   However after this step we get this error in the browser when visiting the product details page
+-   However after this step we the page is created on the server when the request is made.
 
-```
-Runtime Error
-Error: getStaticPaths is required for dynamic SSG pages and is missing for '/products/[id]'.
-Read more: https://nextjs.org/docs/messages/invalid-getstaticpaths-value
-```
-
+- For pages that change very infrequently (eg. product details for products change only once a month on an average, whereas you deploy the multiple times a month), you app can benefit from rendering such pages using a Static Site Generation (SSG) model.
 -   For dynamic routes, Next JS does not know what params (`id` values) exist. It will be unable to generate the pages without the information regarding all possible id values (or at least the ones which are treated as "relevant" enough so as to generate their product detail pages at build time - for example a set of "featured" products).
-    -   To overcome this problem, Next JS requires us to define a `getStaticPaths()` function as well for pages with dynamic params.
+    -   To overcome this problem, Next JS requires us to define a `generateStaticParams()` function as well for pages with dynamic params.
 -   `src/data/services/products.ts` - Add the service method that returns list of all product ids (at least the ones considered relevant for SSG).
-
 ```tsx
-export const getProductsIds = async () => {
+export const getProductIds = async () => {
     const products = await Product.find().select("_id");
     return products.map((p) => p._id.toString());
 };
 ```
-
--   `src/pages/products/[id]/index.tsx` - Add `getStaticPaths()`
-
+-   `src/app/products/[id]/page.tsx` - Add `generateStaticParams()`
 ```tsx
-// import getProductsIds as well now
-import { getProductById, getProductsIds } from "@/data/services/products";
+import { getProductById, getProductIds } from '@/data/services/products';
+```
+```tsx
+export async function generateStaticParams() {
+  const ids = await getProductIds();
 
-// ...component code, getStaticProps() code
+  const idsMap = ids.map((id :number | string) => ({ id: String(id) }))
 
-export const getStaticPaths = async () => {
-    const ids = await getProductsIds();
-    return {
-        paths: ids.map((id) => {
-            return {
-                params: { id: id },
-            };
-        }),
-        fallback: true,
-    };
-};
+  return idsMap;
+}
+```
+- For pages that needs to be recreated periodically (once every hour, day etc.), we can benefit from Incremental Static Generation (ISR).
+- ISR in App Router is only triggered by
+```ts
+await fetch(..., {
+  next: { revalidate: 60 }
+});
+```
+- But since we are not using `fetch()`, we need to manually opt in using a segment config. Add this instead on top of `src/app/products/[id]/page.tsx`.
+```tsx
+export const revalidate = 60;
+```
+
+If you expect slow first loads, you can create `app/products/[id]/loading.tsx`. This is like `isFallback` in Pages Router, but now you fully control the UI.
+```tsx
+export default function Loading() {
+  return <p>Loading product...</p>;
+}
 ```
 
 ## Step 20: Create a `ProductReviews` component to render below Product details (on `/products/[id]`), and an `AddReview` component to render below it on `/products/[id]/addreview`
 
 -   The `ProductDetail` component shows on top for both routes, but what shows below it changes (either `ProductReviews` or `AddReview`)
--   One way to achieve this is using Dynamic routes which match any number of params - this is indicated by naming the file as `[...id]` instead of `[id]`. We start by creating the 2 new components though.
+-   One way to achieve this is using Dynamic routes which match any number of params - this is indicated by naming the file as `[...id]` instead of `[id]`. But with App router's layout file, we can achieve this much more easily.
 -   `src/components/product-details/product-reviews/product-reviews.tsx` - Create `ProductReviews` component
     -   Create a basic component (left as an exercise)
 -   `src/components/product-details/add-review/add-review.tsx` - Create `AddReview` component
-    -   Create a basic component (left as an exercise)
--   `src/pages/products/[_id]/index.tsx` -> Update its name to `src/pages/products/[...id]/index.tsx`
--   Now change the code within the same file to work with array params `id` instead of a single param.
-
+- `app/products/[id]/layout.tsx`
 ```tsx
-// type of id is string[] because of the "catch all" dynamic route [...id]
-export const getStaticProps = async (
-    context: GetStaticPropsContext<{ id: string[] }>
-) => {
-    const { params } = context;
-    const id = params?.id as string[]; // an array of strings
+export const revalidate = 60;
 
-    return {
-        props: {
-            id: id,
-            product: await getProductById(id[0]), // extract the first param which is the product id
-        },
-        revalidate: 60,
-    };
+import { getProductById, getProductIds } from '@/data/services/products';
+import ProductDetail from '@/components/product-detail/product-detail';
+import type { IProduct } from '@/types/Product';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+
+type Props = {
+  params: { id: string };
+  children: ReactNode;
 };
 
-export const getStaticPaths = async () => {
-    const ids = await getProductsIds();
-    return {
-        paths: ids.map((id) => {
-            return {
-                // returns an array of paths with params
-                params: { id: [id] },
-            };
-        }),
-        fallback: true,
-    };
-};
+export async function generateStaticParams() {
+  const ids = await getProductIds(); // e.g. from DB
+  return ids.map((id) => ({ id: String(id) }));
+}
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const product = await getProductById(params.id);
+  return {
+    title: product?.title ?? 'Product details',
+    description: product?.description ?? '',
+  };
+}
 ```
 
--   `src/components/product-detail/product-detail.tsx` - Use the `useRouter()` hook to get the value of `id[1]`. Use it to decide which component to show.
-
+- In `app/products/[id]/page.tsx`
 ```tsx
-// ...other imports
-import { useRouter } from "next/router";
+import ProductReviews from '@/components/product-detail/product-reviews/product-reviews';
 
-import ProductReviews from "./product-reviews/product-reviews";
-import AddReview from "./add-review/add-review";
-
-// ...other code
-
-const ProductDetail = ({ productId, product }: Props) => {
-    const router = useRouter();
-
-    const idRouter = router.query.id as string[];
-
-    if (!idRouter) {
-        return <div>Loading...</div>;
-    }
-
-    let el;
-
-    if (idRouter[1] === undefined) {
-        el = <ProductReviews />;
-    } else if (idRouter[1] !== "addreview") {
-        el = <div>Something went wrong</div>;
-    } else {
-        el = <AddReview />;
-    }
-
-    return (
-        <div>
-            <div className="bg-white shadow-md rounded-lg p-6">{/* UI as before */}</div>
-
-            <div className="mt-6">{el}</div>
-        </div>
-    );
-};
+export default function ProductReviewsPage() {
+  return <ProductReviews />;
+}
 ```
+- In `app/products/[id]/addreview/page.tsx`
+```tsx
+import AddReview from '@/components/product-detail/add-review/add-review';
 
+export default function AddReviewPage() {
+  return <AddReview />;
+}
+```
 -   You will need to manually add `/addreview` at the end of the product details URL to see the component change.
+
+### Set up a context for passing `reviews` and `productId` down to the child route components
+- In `src/context/product-context.tsx`
+```tsx
+'use client';
+
+import { ReactNode } from 'react';
+import { createContext, useContext } from 'react';
+import { IProduct } from '@/types/Product';
+
+export type ProductContextValue = {
+  product: IProduct | null,
+  productId: string
+}
+
+export const ProductContext = createContext<ProductContextValue | null>(null);
+
+export const useProduct = () => {
+  const context = useContext(ProductContext);
+  if (!context) {
+    throw new Error('useProduct must be used within <ProductContext.Provider>');
+  }
+  return context;
+};
+
+export function ProductProvider({
+  children,
+  value,
+}: {
+  children: ReactNode;
+  value: ProductContextValue;
+}) {
+  return <ProductContext.Provider value={value}>{children}</ProductContext.Provider>;
+}
+```
+- Update `app/products/[id]/layout.tsx` to provide product
+```tsx
+import { ProductProvider, ProductContextValue } from '@/context/product-context';
+```
+```tsx
+export default async function ProductLayout({ params, children }: Props) {
+  const { id } = await params;
+  const product: IProduct = await getProductById(id);
+
+  const value : ProductContextValue = {
+    product,
+    productId: id
+  };
+
+  return (
+      <ProductProvider value={value}>
+        <ProductDetail product={product} productId={id} />
+        <div className="mt-6">{children}</div>
+      </ProductProvider>
+  );
+}
+```
 
 ## Step 21: Render product reviews
 
--   `src/components/product-detail/product-reviews/product-reviews.tsx`
-
+- In `components/product-detail/product-reviews/product-reviews.tsx`
 ```tsx
+'use client';
+
+import { useProduct } from '@/context/product-context';
 import { IReview } from "@/types/Product"
 
-type Props = {
-  productId: string | undefined
-  reviews: IReview[]
-}
+const ProductReviews = () => {
+  const { product }  = useProduct();
 
-const ProductReviews = ({ productId, reviews }: Props) => {
+  const reviews = product?.reviews as IReview[];
+
   if (!reviews || reviews.length === 0) {
     return <p>No reviews yet. Be the first one to add a review!</p>
   }
@@ -2154,14 +2145,6 @@ const ProductReviews = ({ productId, reviews }: Props) => {
 }
 
 export default ProductReviews
-```
-
--   `src/components/product-detail/product-detail.tsx` - Make changes to pass the props that ProductReviews now expects
-
-```tsx
-if (idRouter[1] === undefined) {
-    el = <ProductReviews productId={productId} reviews={product.reviews} />;
-}
 ```
 
 -   You can now see the product reviews displayed below the product details
