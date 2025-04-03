@@ -37,13 +37,13 @@ npx create-next-app@14 mantra-store
 
 -   Answer the questions asked like so
 
-✔ Would you like to use TypeScript? … No / __Yes__  
-✔ Would you like to use ESLint? … No / __Yes__  
-✔ Would you like to use Tailwind CSS? … No / __Yes__  
-✔ Would you like your code inside a `src/` directory? … No / __Yes__  
-✔ Would you like to use App Router? (recommended) … No / __Yes__  
-✔ Would you like to use Turbopack for `next dev`? … __No__ / Yes  
-✔ Would you like to customize the import alias (`@/*` by default)? … __No__ / Yes  
+✔ Would you like to use TypeScript? … No / **Yes**  
+✔ Would you like to use ESLint? … No / **Yes**  
+✔ Would you like to use Tailwind CSS? … No / **Yes**  
+✔ Would you like your code inside a `src/` directory? … No / **Yes**  
+✔ Would you like to use App Router? (recommended) … No / **Yes**  
+✔ Would you like to use Turbopack for `next dev`? … **No** / Yes  
+✔ Would you like to customize the import alias (`@/*` by default)? … **No** / Yes
 
 -   Your project would be created in a few moments. You will find the mantra-store folder. Navigate to the folder from within the terminal.
 
@@ -125,19 +125,20 @@ export default function HomePage() {
 import Home from "@/components/home/home";
 import type { Metadata } from "next";
 
-export const metadata : Metadata = {
-  title: "Mantra Store",
-  description:
-    "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+export const metadata: Metadata = {
+    title: "Mantra Store",
+    description:
+        "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
 };
 
 export default function HomePage() {
-  return <Home />;
+    return <Home />;
 }
 ```
 
 -   `app/globals.css` - Set up the theme for your app like so. Understand the various pieces in the code (Setting up theme color palette, font, typography). Tailwind v4 encourages a CSS-first config (e.g. via `@theme`).
-The `next/font/google` injects fonts via inline styles, making it harder to manage in Tailwind’s new `@theme` system.
+    The `next/font/google` injects fonts via inline styles, making it harder to manage in Tailwind’s new `@theme` system.
+
 ```css
 @import "tailwindcss";
 
@@ -171,7 +172,9 @@ body {
     min-height: calc(100vh + 16px);
 }
 ```
-- In `app/layout.tsx`
+
+-   In `app/layout.tsx`
+
 ```tsx
 import type { Metadata } from "next";
 
@@ -186,7 +189,6 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
-
 // If not using Tailwind CSS v4...
 // const roboto = Roboto({
 //   weight: ["400", "500", "700"],
@@ -195,32 +197,34 @@ import "./globals.css";
 // });
 
 export const metadata: Metadata = {
-  title: "Mantra Store",
-  description: "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+    title: "Mantra Store",
+    description:
+        "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      {/* If not using Tailwind CSS v4 */}
-      {/* <body className={`${roboto.className} antialiased`}> */}
-      <body className="antialiased">
-        {children}
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <head>
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1"
+                />
+                <link rel="icon" href="/favicon.ico" />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+                    rel="stylesheet"
+                />
+            </head>
+            {/* If not using Tailwind CSS v4 */}
+            {/* <body className={`${roboto.className} antialiased`}> */}
+            <body className="antialiased">{children}</body>
+        </html>
+    );
 }
 ```
 
@@ -230,73 +234,84 @@ export default function RootLayout({
 -   `src/components/main-navigation/main-navigation.tsx` - Add the following.
 
 ```tsx
-import { useState } from "react"
-import Link from "next/link"
+import { useState } from "react";
+import Link from "next/link";
 
 export default function ResponsiveAppBar() {
-  const [menuOpen, setMenuOpen] = useState(false)
+    const [menuOpen, setMenuOpen] = useState(false);
 
-  return (
-    <header className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold tracking-wide uppercase hidden md:block">
-          Mantra
-        </Link>
+    return (
+        <header className="bg-gray-900 text-white">
+            <div className="container mx-auto px-4 flex items-center justify-between h-16">
+                {/* Logo */}
+                <Link
+                    href="/"
+                    className="text-xl font-bold tracking-wide uppercase hidden md:block"
+                >
+                    Mantra
+                </Link>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden focus:outline-none"
-          aria-label="Toggle menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="md:hidden focus:outline-none"
+                    aria-label="Toggle menu"
+                >
+                    <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                    >
+                        {menuOpen ? (
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        ) : (
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        )}
+                    </svg>
+                </button>
+
+                {/* Desktop Menu */}
+                <nav className="hidden md:flex gap-6">
+                    <Link href="/products" className="hover:underline">
+                        Products
+                    </Link>
+                    <Link href="/products/add" className="hover:underline">
+                        Add a Product
+                    </Link>
+                </nav>
+            </div>
+
+            {/* Mobile Menu Dropdown */}
+            {menuOpen && (
+                <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
+                    <Link
+                        href="/products"
+                        className="block w-full text-left hover:underline"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        Products
+                    </Link>
+                    <Link
+                        href="/products/add"
+                        className="block w-full text-left hover:underline"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        Add a Product
+                    </Link>
+                </div>
             )}
-          </svg>
-        </button>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-6">
-          <Link href="/products" className="hover:underline">
-            Products
-          </Link>
-          <Link href="/products/add" className="hover:underline">
-            Add a Product
-          </Link>
-        </nav>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {menuOpen && (
-        <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
-          <Link
-            href="/products"
-            className="block w-full text-left hover:underline"
-            onClick={() => setMenuOpen(false)}
-          >
-            Products
-          </Link>
-          <Link
-            href="/products/add"
-            className="block w-full text-left hover:underline"
-            onClick={() => setMenuOpen(false)}
-          >
-            Add a Product
-          </Link>
-        </div>
-      )}
-    </header>
-  )
+        </header>
+    );
 }
 ```
 
@@ -305,115 +320,150 @@ export default function ResponsiveAppBar() {
 ```tsx
 import MainNavigation from "@/components/main-navigation/main-navigation";
 ```
+
 ```tsx
 <body className="antialiased">
-  <MainNavigation />
-  <div className="max-w-screen-xl mx-auto mt-12 px-4">
-    {children}
-  </div>
+    <MainNavigation />
+    <div className="max-w-screen-xl mx-auto mt-12 px-4">{children}</div>
 </body>
 ```
-- You get an error saying `MainNavigation` should be a __client component__ as it uses a hook - `useState`.
-- Add this as the first line in `src/components/main-navigation/main-navigation.tsx`
+
+-   You get an error saying `MainNavigation` should be a **client component** as it uses a hook - `useState`.
+-   Add this as the first line in `src/components/main-navigation/main-navigation.tsx`
+
 ```tsx
-'use client';
+"use client";
 ```
-- Making the entire `MainNavigation` is however a blanket approach to making the menu work (by rendering it entirely in the client). In Next JS we try to "push down" client-side rendering as far down the component tree as possible. The top-level components are server components, and client components appear at the bottom level down to the leaves of the component tree. Following this approach, split the `MainNavigation` as follows
-- `src/components/main-navigation/logo/logo.tsx` (server component)
+
+-   Making the entire `MainNavigation` is however a blanket approach to making the menu work (by rendering it entirely in the client). In Next JS we try to "push down" client-side rendering as far down the component tree as possible. The top-level components are server components, and client components appear at the bottom level down to the leaves of the component tree. Following this approach, split the `MainNavigation` as follows
+-   `src/components/main-navigation/logo/logo.tsx` (server component)
+
 ```tsx
 import Link from "next/link";
 
 export default function Logo() {
-  return (
-    <Link href="/" className="text-xl font-bold tracking-wide uppercase hidden md:block">
-      Mantra
-    </Link>
-  );
+    return (
+        <Link
+            href="/"
+            className="text-xl font-bold tracking-wide uppercase hidden md:block"
+        >
+            Mantra
+        </Link>
+    );
 }
 ```
-- `src/components/main-navigation/desktop-navigation/desktop-navigation.tsx` (server component)
+
+-   `src/components/main-navigation/desktop-navigation/desktop-navigation.tsx` (server component)
+
 ```tsx
 import Link from "next/link";
 
 export default function DesktopNavigation() {
-  return (
-    <nav className="hidden md:flex gap-6">
-      <Link href="/products" className="hover:underline">
-        Products
-      </Link>
-      <Link href="/products/add" className="hover:underline">
-        Add a Product
-      </Link>
-    </nav>
-  );
+    return (
+        <nav className="hidden md:flex gap-6">
+            <Link href="/products" className="hover:underline">
+                Products
+            </Link>
+            <Link href="/products/add" className="hover:underline">
+                Add a Product
+            </Link>
+        </nav>
+    );
 }
 ```
-- `src/components/main-navigation/mobile-navigation/mobile-navigation.tsx` (client component)
+
+-   `src/components/main-navigation/mobile-navigation/mobile-navigation.tsx` (client component)
+
 ```tsx
-'use client';
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 
 export default function MobileNavigation() {
-  const [menuOpen, setMenuOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
-  return (
-    <>
-      <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="md:hidden focus:outline-none"
-        aria-label="Toggle menu"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          {menuOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+    return (
+        <>
+            <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden focus:outline-none"
+                aria-label="Toggle menu"
+            >
+                <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                >
+                    {menuOpen ? (
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    ) : (
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+                    )}
+                </svg>
+            </button>
 
-      {menuOpen && (
-        <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
-          <Link href="/products" className="block w-full text-left hover:underline" onClick={() => setMenuOpen(false)}>
-            Products
-          </Link>
-          <Link href="/products/add" className="block w-full text-left hover:underline" onClick={() => setMenuOpen(false)}>
-            Add a Product
-          </Link>
-        </div>
-      )}
-    </>
-  );
+            {menuOpen && (
+                <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
+                    <Link
+                        href="/products"
+                        className="block w-full text-left hover:underline"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        Products
+                    </Link>
+                    <Link
+                        href="/products/add"
+                        className="block w-full text-left hover:underline"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        Add a Product
+                    </Link>
+                </div>
+            )}
+        </>
+    );
 }
 ```
-- `src/components/main-navigation/main-navigation.tsx`
+
+-   `src/components/main-navigation/main-navigation.tsx`
+
 ```tsx
 import Logo from "./logo/logo";
 import DesktopNavigation from "./desktop-navigation/desktop-navigation";
 import MobileNavigation from "./mobile-navigation/mobile-navigation";
 
 export default function ResponsiveAppBar() {
-  return (
-    <header className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        <Logo />
-        <MobileNavigation />
-        <DesktopNavigation />
-      </div>
-    </header>
-  );
+    return (
+        <header className="bg-gray-900 text-white">
+            <div className="container mx-auto px-4 flex items-center justify-between h-16">
+                <Logo />
+                <MobileNavigation />
+                <DesktopNavigation />
+            </div>
+        </header>
+    );
 }
 ```
-- View page source. The HTML contains home and navigation HTML. Even client components are rendered on the server, but they will become interactive (i.e. hydrated) on the client.
+
+-   View page source. The HTML contains home and navigation HTML. Even client components are rendered on the server, but they will become interactive (i.e. hydrated) on the client.
 
 ### Tailwind CSS Breakdown
 
-- `max-w-screen-xl`: maps to MUI's `maxWidth="xl"`.
-- `mx-auto`: centers the container horizontally.
-- `mt-12`: corresponds to `mt: 3` (3 × 4px = `12px`, and Tailwind’s `mt-12` = `48px`, so adjust if needed).
-- `px-4`: optional padding for horizontal spacing on small screens (like MUI's default gutters).
+-   `max-w-screen-xl`: maps to MUI's `maxWidth="xl"`.
+-   `mx-auto`: centers the container horizontally.
+-   `mt-12`: corresponds to `mt: 3` (3 × 4px = `12px`, and Tailwind’s `mt-12` = `48px`, so adjust if needed).
+-   `px-4`: optional padding for horizontal spacing on small screens (like MUI's default gutters).
 
 ---
 
@@ -423,8 +473,10 @@ export default function ResponsiveAppBar() {
 -   This is left as an exercise. Make sure to set up appropriate metadata as well for the pages.
 -   Confirm your implementation with the instructor
 
-__Solution__
-- `components/products-list/products-list.tsx`
+**Solution**
+
+-   `components/products-list/products-list.tsx`
+
 ```tsx
 const ProductsList = () => {
     return (
@@ -436,7 +488,9 @@ const ProductsList = () => {
 
 export default ProductsList;
 ```
-- `components/add-product/add-product.tsx`
+
+-   `components/add-product/add-product.tsx`
+
 ```tsx
 const AddProduct = () => {
     return <div>Add a Product</div>;
@@ -444,127 +498,131 @@ const AddProduct = () => {
 
 export default AddProduct;
 ```
-- `app/products/page.tsx`
+
+-   `app/products/page.tsx`
+
 ```tsx
 import ProductsList from "@/components/products-list/products-list";
 
 export const metadata = {
-  title: "List of products",
-  description: "Mantra Store - search through our variety of products.",
+    title: "List of products",
+    description: "Mantra Store - search through our variety of products.",
 };
 
 export default function ProductsPage() {
-  return <ProductsList />;
+    return <ProductsList />;
 }
 ```
-- `app/products/add/page.tsx`
+
+-   `app/products/add/page.tsx`
+
 ```tsx
 import AddProduct from "@/components/add-product/add-product";
 
 export const metadata = {
-  title: "Add a Product",
-  description: "Mantra Store - add a new product to the store",
+    title: "Add a Product",
+    description: "Mantra Store - add a new product to the store",
 };
 
 export default function AddProductsPage() {
-  return <AddProduct />;
+    return <AddProduct />;
 }
 ```
 
 ## Step 10: A decent Home component
 
--   `src/components/home/home.tsx` - We create a responsive grid of images. 
+-   `src/components/home/home.tsx` - We create a responsive grid of images.
 -   Understand the Tailwind CSS classes and how they make the UI responsive.
 
 ```tsx
-import Image from "next/image"
+import Image from "next/image";
 
 export default function Home() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-7">
-      {/* Image Grid */}
-      <div>
-        <div className="grid grid-cols-3 gap-4">
-          {itemData.map((item) => (
-            <div key={item.img} className="relative w-full h-44">
-              <Image
-                src={item.img}
-                alt={item.title}
-                fill
-                className="object-cover rounded"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-7">
+            {/* Image Grid */}
+            <div>
+                <div className="grid grid-cols-3 gap-4">
+                    {itemData.map((item) => (
+                        <div key={item.img} className="relative w-full h-44">
+                            <Image
+                                src={item.img}
+                                alt={item.title}
+                                fill
+                                className="object-cover rounded"
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Text Content */}
-      <div className="flex items-center justify-center text-2xl font-semibold">
-        Mantra
-      </div>
-    </div>
-  )
+            {/* Text Content */}
+            <div className="flex items-center justify-center text-2xl font-semibold">
+                Mantra
+            </div>
+        </div>
+    );
 }
 
 const itemData = [
-  {
-    img: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-    title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-  },
-  {
-    img: "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg",
-    title: "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-  },
-  {
-    img: "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
-    title: "White Gold Plated Princess",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
-    title: "Basketball",
-  },
-  {
-    img: "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
-    title: "WD 2TB Elements Portable External Hard Drive - USB 3.0",
-  },
-  {
-    img: "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
-    title: "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
-  },
-  {
-    img: "https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg",
-    title: "Rain Jacket Women Windbreaker Striped Climbing Raincoats",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1471357674240-e1a485acb3e1",
-    title: "Sea star",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6",
-    title: "Bike",
-  },
-]
+    {
+        img: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+        title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+    },
+    {
+        img: "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg",
+        title: "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
+        title: "Camera",
+    },
+    {
+        img: "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
+        title: "White Gold Plated Princess",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
+        title: "Hats",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
+        title: "Honey",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
+        title: "Basketball",
+    },
+    {
+        img: "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
+        title: "WD 2TB Elements Portable External Hard Drive - USB 3.0",
+    },
+    {
+        img: "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
+        title: "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
+    },
+    {
+        img: "https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg",
+        title: "Rain Jacket Women Windbreaker Striped Climbing Raincoats",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1471357674240-e1a485acb3e1",
+        title: "Sea star",
+    },
+    {
+        img: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6",
+        title: "Bike",
+    },
+];
 ```
 
 ### Tailwind CSS breakdown
 
-- `grid grid-cols-3 gap-4`: matches MUI’s `cols={3}` and spacing.
-- `h-44`: approximates `rowHeight={168}` in pixels.
-- `Image fill + object-cover`: replaces raw `<img>` to maintain aspect ratio and responsive fit.
-- `lg:grid-cols-2`: achieves responsive 2-column layout like `md={12} lg={6}`.
+-   `grid grid-cols-3 gap-4`: matches MUI’s `cols={3}` and spacing.
+-   `h-44`: approximates `rowHeight={168}` in pixels.
+-   `Image fill + object-cover`: replaces raw `<img>` to maintain aspect ratio and responsive fit.
+-   `lg:grid-cols-2`: achieves responsive 2-column layout like `md={12} lg={6}`.
 
 ---
 
@@ -572,32 +630,34 @@ const itemData = [
 
 ```tsx
 <div className="lg:col-span-1">
-  <h1 className="text-3xl font-semibold mb-2">Mantra</h1>
-  <h2 className="text-xl font-medium mb-6">The Honest Store</h2>
-  <p className="text-base leading-relaxed">
-    If you cannot find what you are looking for here, it is likely not a
-    thing! If you find it elsewhere at a lesser price, we will match the
-    price for you!!
-  </p>
+    <h1 className="text-3xl font-semibold mb-2">Mantra</h1>
+    <h2 className="text-xl font-medium mb-6">The Honest Store</h2>
+    <p className="text-base leading-relaxed">
+        If you cannot find what you are looking for here, it is likely not a
+        thing! If you find it elsewhere at a lesser price, we will match the
+        price for you!!
+    </p>
 </div>
 ```
 
 ### Tailwind CSS breakdown
 
-- **`text-3xl`**: Sets the font size to "3xl" (typically `1.875rem` or `30px`).
-- **`font-semibold`**: Applies a semi-bold font weight (`600`).
-- **`text-xl`**: Sets the font size to "xl" (`1.25rem` or `20px`).
-- **`font-medium`**: Applies a medium font weight (`500`).
-- **`text-base`**: Sets the font size to base (`1rem` or `16px`), standard for body text.
-- **`leading-relaxed`**: Applies relaxed line height (typically `1.625`), improving readability.
-- **`mb-2`**: Adds a bottom margin of `0.5rem` (`8px`).
-- **`mb-6`**: Adds a bottom margin of `1.5rem` (`24px`).
-- **`lg:col-span-1`**: In large viewports, spans 1 column in a grid layout. Used for layout control inside responsive grids.
+-   **`text-3xl`**: Sets the font size to "3xl" (typically `1.875rem` or `30px`).
+-   **`font-semibold`**: Applies a semi-bold font weight (`600`).
+-   **`text-xl`**: Sets the font size to "xl" (`1.25rem` or `20px`).
+-   **`font-medium`**: Applies a medium font weight (`500`).
+-   **`text-base`**: Sets the font size to base (`1rem` or `16px`), standard for body text.
+-   **`leading-relaxed`**: Applies relaxed line height (typically `1.625`), improving readability.
+-   **`mb-2`**: Adds a bottom margin of `0.5rem` (`8px`).
+-   **`mb-6`**: Adds a bottom margin of `1.5rem` (`24px`).
+-   **`lg:col-span-1`**: In large viewports, spans 1 column in a grid layout. Used for layout control inside responsive grids.
 
 ---
 
-__Optional Step__: Fetching JSON data from a local JSON file
-- In `/public/data/products-images.json`
+**Optional Step**: Fetching JSON data from a local JSON file
+
+-   In `/public/data/products-images.json`
+
 ```json
 [
     {
@@ -650,37 +710,48 @@ __Optional Step__: Fetching JSON data from a local JSON file
     }
 ]
 ```
-- In `.env.local`
+
+-   In `.env.local`
+
 ```
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
-- In `app/page.tsx`
+
+-   In `app/page.tsx`
+
 ```tsx
 export default async function HomePage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/data/product-images.json`, {
-    cache: 'force-cache'
-  });
-  const images = await res.json();
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL}/data/product-images.json`,
+        {
+            cache: "force-cache",
+        }
+    );
+    const images = await res.json();
 
-  return <Home images={images} />;
+    return <Home images={images} />;
 }
 ```
-- The page component being a serve component, runs on the server. When called without any argument, `fetch` executes at build time and caches the response. It is neve called again (when individual request comes in for the home page). Instead the response cached at build time is reused. This is the equivalent of Static Site Generation (SSG) for this page, implemented using `getStaticProps()` in Pages router.
-- For SSG (Static Site Generation) in the App Router, this is fetch configuration default. So we can actually omit it from this particular call.
+
+-   The page component being a serve component, runs on the server. When called without any argument, `fetch` executes at build time and caches the response. It is neve called again (when individual request comes in for the home page). Instead the response cached at build time is reused. This is the equivalent of Static Site Generation (SSG) for this page, implemented using `getStaticProps()` in Pages router.
+-   For SSG (Static Site Generation) in the App Router, this is fetch configuration default. So we can actually omit it from this particular call.
+
 ```ts
 {
-  cache: 'force-cache'
+    cache: "force-cache";
 }
 ```
-- Modify `components/home/home.tsx` to accept the image data as props
+
+-   Modify `components/home/home.tsx` to accept the image data as props
+
 ```tsx
 import Image from "next/image";
 
 interface Props {
-    images: { img: string, title: string }[];
+    images: { img: string; title: string }[];
 }
 
-export default function Home( { images } : Props ) {
+export default function Home({ images }: Props) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-7">
             {/* Image Grid */}
@@ -743,49 +814,57 @@ const nextConfig: NextConfig = {
 
 -   Observe the difference in look. Apart from this all optimizations are enabled.
 
-
 ## Step 12: Understanding Rendering models - mainly SSG
 
 **Next.js (using the App Router)** enables building full-stack applications by combining server-side logic with client-side interactivity. It supports rendering components on the server as well as the client. Data fetching and component rendering can happen in the following ways:
-  - **Static Site Generation (SSG)** — Data is fetched at **build time** and the result is cached and reused. This is the default behavior when using `fetch()` without options (i.e., `cache: 'force-cache'`).
-  - **Server-Side Rendering (SSR)** — Data is fetched on **every request**. This is enabled using `fetch()` with `{ cache: 'no-store' }` or `{ next: { revalidate: 0 } }`.
-  - **React Server Components (RSC)** — Components rendered on the server **without producing client-side JavaScript**. RSCs are streamed to the browser as a serialized React tree and are **not hydrated**, making them highly efficient.
-**Important:**
-  - RSC is **not a separate rendering strategy like SSG or SSR** — it's a rendering **model**. RSC is a *component model*, not a fetch/render timing strategy. RSCs can be static (SSG), cached, or dynamic (SSR-like).
-  - In the App Router, **RSC is the default rendering model** for all components that do not include `'use client'`. 
 
-__NOTE__:
-- `getStaticProps()` (SSG), `getStaticPaths()` (SSG), `getServerSideProps()` (SSR), is part of the Pages Router API
-- In the App Router, it's replaced by:
-  - `fetch()` in Server Components (to control caching behavior and render using SSG / SSR rendering strategy)
-  - `generateStaticParams()` for dynamic static pages (equivalent of `getStaticPaths()` for SSG)
-  - `generateMetadata()` for `<head>` metadata (especially for `title`, and other `meta` information in dynamic static pages (SSG), SSR pages)
+-   **Static Site Generation (SSG)** — Data is fetched at **build time** and the result is cached and reused. This is the default behavior when using `fetch()` without options (i.e., `cache: 'force-cache'`).
+-   **Server-Side Rendering (SSR)** — Data is fetched on **every request**. This is enabled using `fetch()` with `{ cache: 'no-store' }` or `{ next: { revalidate: 0 } }`.
+-   **React Server Components (RSC)** — Components rendered on the server **without producing client-side JavaScript**. RSCs are streamed to the browser as a serialized React tree and are **not hydrated**, making them highly efficient.
+    **Important:**
+-   RSC is **not a separate rendering strategy like SSG or SSR** — it's a rendering **model**. RSC is a _component model_, not a fetch/render timing strategy. RSCs can be static (SSG), cached, or dynamic (SSR-like).
+-   In the App Router, **RSC is the default rendering model** for all components that do not include `'use client'`.
+
+**NOTE**:
+
+-   `getStaticProps()` (SSG), `getStaticPaths()` (SSG), `getServerSideProps()` (SSR), is part of the Pages Router API
+-   In the App Router, it's replaced by:
+
+    -   `fetch()` in Server Components (to control caching behavior and render using SSG / SSR rendering strategy)
+    -   `generateStaticParams()` for dynamic static pages (equivalent of `getStaticPaths()` for SSG)
+    -   `generateMetadata()` for `<head>` metadata (especially for `title`, and other `meta` information in dynamic static pages (SSG), SSR pages)
 
 -   Right click the Home page and "View page source" -> you will find rendered HTML coming from the server rather than an empty `<div id="root"></div>` like in regular client-side only React apps (like the one created using create-react-app)
 -   From the terminal run
+
 ```
 npm run build
 ```
-- __NOTE__: This will encounter an error if you implemented the optional step of fetching data from the public folder via the server (since the dev server may not be running). You can overcome this in one of the 2 ways below
-  - Make sure the development server is running in one terminal, and run the build from a separate terminal
-  - Use the `fs` module instead to read the JSON. Make the following changes in `app/page.tsx`
+
+-   **NOTE**: This will encounter an error if you implemented the optional step of fetching data from the public folder via the server (since the dev server may not be running). You can overcome this in one of the 2 ways below
+    -   Make sure the development server is running in one terminal, and run the build from a separate terminal
+    -   Use the `fs` module instead to read the JSON. Make the following changes in `app/page.tsx`
+
 ```tsx
 import fs from "fs/promises";
 import path from "path";
 import Home from "@/components/home/home";
 
 export const metadata = {
-  title: "Mantra Store",
-  description:
-    "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
+    title: "Mantra Store",
+    description:
+        "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
 };
 
 export default async function HomePage() {
-  const filePath = path.join(process.cwd(), "public/data/product-images.json");
-  const jsonData = await fs.readFile(filePath, "utf-8");
-  const images = JSON.parse(jsonData);
+    const filePath = path.join(
+        process.cwd(),
+        "public/data/product-images.json"
+    );
+    const jsonData = await fs.readFile(filePath, "utf-8");
+    const images = JSON.parse(jsonData);
 
-  return <Home images={images} />;
+    return <Home images={images} />;
 }
 ```
 
@@ -793,8 +872,8 @@ export default async function HomePage() {
 
 ### Rendering Legend
 
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
+○ (Static) prerendered as static content
+ƒ (Dynamic) server-rendered on demand
 
 --
 
@@ -805,7 +884,8 @@ export default async function HomePage() {
 -   For statically generated pages, Next.js serves pre-rendered HTML files by default.
 -   When navigating between statically generated pages (all components in Pages router, and client components only in App router) using client-side routing, Next.js uses client-side JavaScript to handle the navigation and loads necessary JavaScript chunks for the new page while still using the pre-rendered HTML content. It hydrates the existing static HTML content with the client-side JavaScript, allowing for interactive behavior without a full server round-trip.
     -   These chunks can be found in the `.next/static/chunks/pages` folder.
-- Run the production build. You should notice a perceptible difference in the app's responsiveness when you navigate bwteen pages.
+-   Run the production build. You should notice a perceptible difference in the app's responsiveness when you navigate bwteen pages.
+
 ```
 npm start
 ```
@@ -827,11 +907,12 @@ DATABASE_CONNECTION_STRING=mongodb+srv://puranik:Mantra123$@cluster0.duet2eg.mon
 
 -   `src/data/init.ts` - Set up the database connection.
 -   Install mongoose.
+
 ```sh
 npm i mongoose
 ```
-This is an alternative to using the MongoDB official driver for Node JS - MongoClient. It is an ODM (like ORM for RDBMS) and provides model validation, mapping based on relationships between collections etc.
--
+
+## This is an alternative to using the MongoDB official driver for Node JS - MongoClient. It is an ODM (like ORM for RDBMS) and provides model validation, mapping based on relationships between collections etc.
 
 ```ts
 import mongoose from "mongoose";
@@ -1056,38 +1137,43 @@ import { getProducts } from "@/data/services/products";
 import type { IProduct } from "@/types/Product";
 
 export const metadata: Metadata = {
-  title: "List of products",
-  description: "Mantra Store - search through our variety of products.",
+    title: "List of products",
+    description: "Mantra Store - search through our variety of products.",
 };
 
 export default async function ProductsPage() {
-  try {
-    const { count, page, products }: {
-      count: number;
-      page: number;
-      products: IProduct[];
-    } = await getProducts();
+    try {
+        const {
+            count,
+            page,
+            products,
+        }: {
+            count: number;
+            page: number;
+            products: IProduct[];
+        } = await getProducts();
 
-    return <ProductsList products={products} count={count} page={page} />;
-  } catch (error) {
-    // console.error("Failed to load products:", (error as Error).message);
-    // Option 1: Render a fallback UI - Graceful Fallback UI that shows up on /products route in the client
-    // return <div>Failed to load products. Please try again later.</div>;
+        return <ProductsList products={products} count={count} page={page} />;
+    } catch (error) {
+        // console.error("Failed to load products:", (error as Error).message);
+        // Option 1: Render a fallback UI - Graceful Fallback UI that shows up on /products route in the client
+        // return <div>Failed to load products. Please try again later.</div>;
 
-    // Option 2: Interrupts rendering and bubbles up to error boundaries
-    // go to the closest `error.tsx` boundary (or the root one) - Error page gets access to the error and reset method to retry page rendering and is a client component
-    throw new Error("Failed to load products. Please try again later.");
-    
-    // Option 3
-    // trigger the /app/not-found.tsx route (if defined) - Not Found page does not get access to the error and is a server component
-    // notFound(); // if you want to mimic `return { notFound: true }`
-  }
+        // Option 2: Interrupts rendering and bubbles up to error boundaries
+        // go to the closest `error.tsx` boundary (or the root one) - Error page gets access to the error and reset method to retry page rendering and is a client component
+        throw new Error("Failed to load products. Please try again later.");
+
+        // Option 3
+        // trigger the /app/not-found.tsx route (if defined) - Not Found page does not get access to the error and is a server component
+        // notFound(); // if you want to mimic `return { notFound: true }`
+    }
 }
 ```
 
--  `app/products/error.tsx` (alternatively you can create `app/error.tsx` for making this available to every page in the application)
+-   `app/products/error.tsx` (alternatively you can create `app/error.tsx` for making this available to every page in the application)
+
 ```tsx
-'use client';
+"use client";
 
 // The error object passed by Next.js often includes a digest (a hashed error signature for debugging)
 interface Props {
@@ -1096,27 +1182,28 @@ interface Props {
 }
 
 export default function Error({ error, reset }: Props) {
-  console.error("Page error:", error);
+    console.error("Page error:", error);
 
-  return (
-    <div>
-      <h2>Something went wrong.</h2>
-      <p>{error.message}</p>
-      <button onClick={reset}>Try again</button>
-    </div>
-  );
+    return (
+        <div>
+            <h2>Something went wrong.</h2>
+            <p>{error.message}</p>
+            <button onClick={reset}>Try again</button>
+        </div>
+    );
 }
 ```
 
-- Alternatively, if you called `notFound()` (option 3), you can create a `app/products/not-found.tsx` (you can create `app/not-found.tsx` for making this available to every page in the application)
+-   Alternatively, if you called `notFound()` (option 3), you can create a `app/products/not-found.tsx` (you can create `app/not-found.tsx` for making this available to every page in the application)
+
 ```tsx
 export default function NotFoundPage() {
-  return (
-    <div>
-      <h1>Products not found</h1>
-      <p>We couldn't load the product list. Please try again later.</p>
-    </div>
-  );
+    return (
+        <div>
+            <h1>Products not found</h1>
+            <p>We couldn't load the product list. Please try again later.</p>
+        </div>
+    );
 }
 ```
 
@@ -1184,87 +1271,97 @@ npm i -D sass
 ```
 
 -   `src/components/products-list/item/item.tsx` - Make sure you understand the code. But before that install `react-icons`
+
 ```sh
 npm i react-icons
 ```
+
 ```tsx
-import { IProduct } from "@/types/Product"
-import Link from "next/link"
-import Image from "next/image"
-import { FaShareAlt } from "react-icons/fa"
+import { IProduct } from "@/types/Product";
+import Link from "next/link";
+import Image from "next/image";
+import { FaShareAlt } from "react-icons/fa";
 
 import classes from "./item.module.scss";
 
 type Props = {
-  product: IProduct
-}
+    product: IProduct;
+};
 
 const getBgColor = (category: IProduct["category"]) => {
-  const categoryBgColorMap = {
-    "men's clothing": "bg-olive-600",
-    "women's clothing": "bg-blue-600",
-    jewelery: "bg-yellow-600",
-    electronics: "bg-gray-600",
-  }
+    const categoryBgColorMap = {
+        "men's clothing": "bg-olive-600",
+        "women's clothing": "bg-blue-600",
+        jewelery: "bg-yellow-600",
+        electronics: "bg-gray-600",
+    };
 
-  return categoryBgColorMap[category] || "bg-gray-400"
-}
+    return categoryBgColorMap[category] || "bg-gray-400";
+};
 
 const ProductListItem = ({ product }: Props) => {
-  return (
-    <div className="`flex flex-col w-full rounded-md shadow-md overflow-hidden border bg-white ${classes.category__container}`">
-      {/* Category Tag */}
-      <div className={`text-white text-sm px-3 py-1 ${classes.category} ${getBgColor(product.category)}`}>
-        {product.category}
-      </div>
+    return (
+        <div className="`flex flex-col w-full rounded-md shadow-md overflow-hidden border bg-white ${classes.category__container}`">
+            {/* Category Tag */}
+            <div
+                className={`text-white text-sm px-3 py-1 ${
+                    classes.category
+                } ${getBgColor(product.category)}`}
+            >
+                {product.category}
+            </div>
 
-      {/* Image */}
-      <Image
-            src={product.image}
-            alt={product.title}
-            width={500}
-            height={192}
-            className="w-full h-48 object-contain p-4"
-            sizes="(max-width: 768px) 100vw, 33vw"
-            priority
-        />
+            {/* Image */}
+            <Image
+                src={product.image}
+                alt={product.title}
+                width={500}
+                height={192}
+                className="w-full h-48 object-contain p-4"
+                sizes="(max-width: 768px) 100vw, 33vw"
+                priority
+            />
 
-      {/* Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
-        <h3 className="text-lg font-medium mb-3 truncate">{product.title}</h3>
+            {/* Content */}
+            <div className="p-4 flex-1 flex flex-col justify-between">
+                <h3 className="text-lg font-medium mb-3 truncate">
+                    {product.title}
+                </h3>
 
-        <div className="flex items-center gap-2 text-sm mb-4">
-          <span title={product.rating.rate.toFixed(2)}>
-            ⭐ {product.rating.rate.toFixed(1)}
-          </span>
-          <span className="text-gray-500">({product.rating.count} ratings)</span>
+                <div className="flex items-center gap-2 text-sm mb-4">
+                    <span title={product.rating.rate.toFixed(2)}>
+                        ⭐ {product.rating.rate.toFixed(1)}
+                    </span>
+                    <span className="text-gray-500">
+                        ({product.rating.count} ratings)
+                    </span>
+                </div>
+
+                <p className="text-sm text-gray-700 mb-4">
+                    <strong>Price:</strong> ${product.price}
+                </p>
+            </div>
+
+            {/* Actions */}
+            <div className="px-4 py-2 flex items-center justify-between border-t">
+                <button
+                    aria-label="share"
+                    className="text-gray-600 hover:text-gray-900 transition"
+                >
+                    <FaShareAlt />
+                </button>
+                <Link
+                    href={`/products/${product._id}`}
+                    className="text-sm font-semibold text-blue-600 hover:underline"
+                >
+                    KNOW MORE
+                </Link>
+            </div>
         </div>
+    );
+};
 
-        <p className="text-sm text-gray-700 mb-4">
-          <strong>Price:</strong> ${product.price}
-        </p>
-      </div>
-
-      {/* Actions */}
-      <div className="px-4 py-2 flex items-center justify-between border-t">
-        <button
-          aria-label="share"
-          className="text-gray-600 hover:text-gray-900 transition"
-        >
-          <FaShareAlt />
-        </button>
-        <Link
-          href={`/products/${product._id}`}
-          className="text-sm font-semibold text-blue-600 hover:underline"
-        >
-          KNOW MORE
-        </Link>
-      </div>
-    </div>
-  )
-}
-
-export default ProductListItem
+export default ProductListItem;
 ```
 
 ## Step 17: Set up API route to fetch products page-by-page from the client-side
@@ -1294,48 +1391,44 @@ import { IApiResponse, IErrorMessage } from "@/types/api";
 import { getProducts } from "@/data/services/products";
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const pageParam = searchParams.get("page");
-    const page = pageParam ? Number(pageParam) : 1;
+    try {
+        const { searchParams } = new URL(req.url);
+        const pageParam = searchParams.get("page");
+        const page = pageParam ? Number(pageParam) : 1;
 
-    const {
-      count,
-      page: inferredPage,
-      products,
-    } = await getProducts(page);
+        const { count, page: inferredPage, products } = await getProducts(page);
 
-    const json: IApiResponse<{
-      count: number;
-      page: number;
-      products: IProduct[];
-    }> = {
-      status: "success",
-      message: {
-        count,
-        page: inferredPage,
-        products,
-      },
-    };
+        const json: IApiResponse<{
+            count: number;
+            page: number;
+            products: IProduct[];
+        }> = {
+            status: "success",
+            message: {
+                count,
+                page: inferredPage,
+                products,
+            },
+        };
 
-    return NextResponse.json(json);
-  } catch (error) {
-    const err: IErrorMessage = {
-      status: "error",
-      message: (error as Error).message,
-    };
-    return NextResponse.json(err, { status: 500 });
-  }
+        return NextResponse.json(json);
+    } catch (error) {
+        const err: IErrorMessage = {
+            status: "error",
+            message: (error as Error).message,
+        };
+        return NextResponse.json(err, { status: 500 });
+    }
 }
 
 export async function POST() {
-  return NextResponse.json(
-    {
-      status: "error",
-      message: "METHOD=POST not allowed",
-    } satisfies IErrorMessage,
-    { status: 405 }
-  );
+    return NextResponse.json(
+        {
+            status: "error",
+            message: "METHOD=POST not allowed",
+        } satisfies IErrorMessage,
+        { status: 405 }
+    );
 }
 ```
 
@@ -1346,174 +1439,185 @@ export async function POST() {
 -   `src/services/products.ts` - Note that this is **different from** `src/data/services/products.ts`. - We shall set up client-side API services in this new file.
 
 ```tsx
-import { IProduct } from "../types/Product"
+import { IProduct } from "../types/Product";
 
 type IGetProductsResponse = {
-  status: "success" | "error"
-  message: {
-    count: number
-    page: number
-    products: IProduct[]
-  }
-}
+    status: "success" | "error";
+    message: {
+        count: number;
+        page: number;
+        products: IProduct[];
+    };
+};
 
 export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
-  // const res = await fetch(`/api/products?page=${page}`)
-  
-  // NOTE: process.env.NEXT_PUBLIC_SITE_URL -> Needs dev server to be running during build to work. Work around @todo -> SSG in `app/products/page.tsx` needs to fetch from DB service rather than this frontend API service, but yet construct cached response for frontend in this response format - i.e. { status: 'success', message: { count, page, products } }
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products?page=${page}`)
+    // const res = await fetch(`/api/products?page=${page}`)
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch products")
-  }
+    // NOTE: process.env.NEXT_PUBLIC_SITE_URL -> Needs dev server to be running during build to work. Work around @todo -> SSG in `app/products/page.tsx` needs to fetch from DB service rather than this frontend API service, but yet construct cached response for frontend in this response format - i.e. { status: 'success', message: { count, page, products } }
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/products?page=${page}`
+    );
 
-  const data: IGetProductsResponse = await res.json()
-  return data
+    if (!res.ok) {
+        throw new Error("Failed to fetch products");
+    }
+
+    const data: IGetProductsResponse = await res.json();
+    return data;
 };
 ```
 
 -   `src/components/products-list/products-list.tsx` - Add support for client-side pagination. We also handle loading state, and show errors in a Snackbar. Most of the Snackbar code is taken from an example on the component in the MUI documentation.
 
 ```tsx
-'use client';
+"use client";
 
-import { useEffect, useState } from "react"
-import { IProduct } from "@/types/Product"
-import ProductListItem from "./item/item"
-import { getProducts } from "@/services/products"
+import { useEffect, useState } from "react";
+import { IProduct } from "@/types/Product";
+import ProductListItem from "./item/item";
+import { getProducts } from "@/services/products";
 
 type Props = {
-  count: number
-  page: number
-  products: IProduct[]
-}
+    count: number;
+    page: number;
+    products: IProduct[];
+};
 
 const ProductsList = ({ count, page, products }: Props) => {
-  const [actualPage, setActualPage] = useState(page)
-  const [actualCount, setActualCount] = useState(count)
-  const [actualProducts, setActualProducts] = useState(products)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [showError, setShowError] = useState(false)
+    const [actualPage, setActualPage] = useState(page);
+    const [actualCount, setActualCount] = useState(count);
+    const [actualProducts, setActualProducts] = useState(products);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+    const [showError, setShowError] = useState(false);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true)
-      try {
-        const {
-          message: { products, count },
-        } = await getProducts(actualPage)
-        setActualProducts(products)
-        setActualCount(count)
-        setError(null)
-        setShowError(false)
-      } catch (err) {
-        setError(err as Error)
-        setShowError(true)
-      } finally {
-        setLoading(false)
-      }
-    }
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const {
+                    message: { products, count },
+                } = await getProducts(actualPage);
+                setActualProducts(products);
+                setActualCount(count);
+                setError(null);
+                setShowError(false);
+            } catch (err) {
+                setError(err as Error);
+                setShowError(true);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchProducts()
-  }, [actualPage])
+        fetchProducts();
+    }, [actualPage]);
 
-  const totalPages = Math.ceil(actualCount / 10)
+    const totalPages = Math.ceil(actualCount / 10);
 
-  return (
-    <div>
-      <h1 className="text-3xl font-semibold mb-4">List of products</h1>
-      <hr className="border-b border-gray-300 mb-6" />
+    return (
+        <div>
+            <h1 className="text-3xl font-semibold mb-4">List of products</h1>
+            <hr className="border-b border-gray-300 mb-6" />
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center mb-6">
-        <nav className="inline-flex rounded-md shadow-sm">
-          {[...Array(totalPages)].map((_, idx) => {
-            const pageNumber = idx + 1
-            return (
-              <button
-                key={pageNumber}
-                onClick={() => setActualPage(pageNumber)}
-                className={`px-4 py-2 border text-sm ${
-                  actualPage === pageNumber
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                }`}
-              >
-                {pageNumber}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
-
-      {/* Loading Spinner */}
-      {loading && (
-        <div className="flex justify-center my-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
-        </div>
-      )}
-
-      {/* Error Snackbar */}
-      {showError && error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 max-w-xl mx-auto">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error.message}</span>
-          <button
-            onClick={() => setShowError(false)}
-            className="absolute top-0 bottom-0 right-0 px-4 py-3"
-          >
-            <svg
-              className="fill-current h-6 w-6 text-red-700"
-              role="button"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <title>Close</title>
-              <path d="M14.348 5.652a1 1 0 10-1.414-1.414L10 7.172 7.066 4.238a1 1 0 00-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 001.414 1.414L10 12.828l2.934 2.934a1 1 0 001.414-1.414L11.414 10l2.934-2.934z" />
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* Product Grid */}
-      {!loading && !error && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
-          {actualProducts.map((product) => (
-            <div key={product._id} className="flex items-stretch">
-              <ProductListItem product={product} />
+            {/* Pagination Controls */}
+            <div className="flex justify-center mb-6">
+                <nav className="inline-flex rounded-md shadow-sm">
+                    {[...Array(totalPages)].map((_, idx) => {
+                        const pageNumber = idx + 1;
+                        return (
+                            <button
+                                key={pageNumber}
+                                onClick={() => setActualPage(pageNumber)}
+                                className={`px-4 py-2 border text-sm ${
+                                    actualPage === pageNumber
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                }`}
+                            >
+                                {pageNumber}
+                            </button>
+                        );
+                    })}
+                </nav>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
 
-export default ProductsList
+            {/* Loading Spinner */}
+            {loading && (
+                <div className="flex justify-center my-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
+                </div>
+            )}
+
+            {/* Error Snackbar */}
+            {showError && error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 max-w-xl mx-auto">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">{error.message}</span>
+                    <button
+                        onClick={() => setShowError(false)}
+                        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    >
+                        <svg
+                            className="fill-current h-6 w-6 text-red-700"
+                            role="button"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                        >
+                            <title>Close</title>
+                            <path d="M14.348 5.652a1 1 0 10-1.414-1.414L10 7.172 7.066 4.238a1 1 0 00-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 001.414 1.414L10 12.828l2.934 2.934a1 1 0 001.414-1.414L11.414 10l2.934-2.934z" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
+            {/* Product Grid */}
+            {!loading && !error && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
+                    {actualProducts.map((product) => (
+                        <div key={product._id} className="flex items-stretch">
+                            <ProductListItem product={product} />
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ProductsList;
 ```
 
 ### Optional improvement: Caching data using TanStack Query
-You can use __Tanstack Query__ aka __React Query__ to cache data fetched on the client-side
+
+You can use **Tanstack Query** aka **React Query** to cache data fetched on the client-side
+
 ```
 npm i @tanstack/react-query
 ```
-- In `src/components/lib/react-query/hydrate-client.tsx`
-```tsx
-'use client';
 
-import { HydrationBoundary, HydrationBoundaryProps } from '@tanstack/react-query';
+-   In `src/components/lib/react-query/hydrate-client.tsx`
+
+```tsx
+"use client";
+
+import {
+    HydrationBoundary,
+    HydrationBoundaryProps,
+} from "@tanstack/react-query";
 
 type Props = HydrationBoundaryProps & {
-  children: React.ReactNode;
+    children: React.ReactNode;
 };
 
 export default function HydrateClient({ children, ...props }: Props) {
-  return <HydrationBoundary {...props}>{children}</HydrationBoundary>;
+    return <HydrationBoundary {...props}>{children}</HydrationBoundary>;
 }
 ```
-- In `src/app/products/page.tsx`, wrap `getProducts()` with React Query - This allows the initial request to be cached and reused by React Query on the client. Then add `dehydratedState` to the returned props. This will help hydrate the TanStack Query cache on the client side in the next step we do. Note that you are no longer using the data services - you are using the same API services as used in the client-side (`@/services/products`)
-- __TODO__: Check if this works at build-time if dev server is NOT running, as it hits client-side API service.
+
+-   In `src/app/products/page.tsx`, wrap `getProducts()` with React Query - This allows the initial request to be cached and reused by React Query on the client. Then add `dehydratedState` to the returned props. This will help hydrate the TanStack Query cache on the client side in the next step we do. Note that you are no longer using the data services - you are using the same API services as used in the client-side (`@/services/products`)
+-   **TODO**: Check if this works at build-time if dev server is NOT running, as it hits client-side API service.
+
 ```tsx
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import HydrateClient from "@/components/lib/react-query/hydrate-client";
@@ -1523,133 +1627,141 @@ import type { Metadata } from "next";
 import type { IProduct } from "@/types/Product";
 
 export const metadata: Metadata = {
-  title: "List of products",
-  description: "Mantra Store - search through our variety of products.",
+    title: "List of products",
+    description: "Mantra Store - search through our variety of products.",
 };
 
 export default async function ProductsPage() {
-  try {
-    // SSG with React Query hydration
-    const queryClient = new QueryClient();
+    try {
+        // SSG with React Query hydration
+        const queryClient = new QueryClient();
 
-    // Preload the page=1 data into React Query's cache
-    await queryClient.prefetchQuery({
-      queryKey: ["products", 1],
-      queryFn: () => getProducts(1),
-    });
+        // Preload the page=1 data into React Query's cache
+        await queryClient.prefetchQuery({
+            queryKey: ["products", 1],
+            queryFn: () => getProducts(1),
+        });
 
-    const {
-      products, count, page
-    } = await getProducts(1);
+        const { products, count, page } = await getProducts(1);
 
-    const dehydratedState = dehydrate(queryClient);
+        const dehydratedState = dehydrate(queryClient);
 
-    return (
-      <HydrateClient state={dehydratedState}>
-        <ProductsList products={products} count={count} page={page} />
-      </HydrateClient>
-    );
-  } catch (error) {
-    throw new Error("Failed to load products. Please try again later.");
-  }
+        return (
+            <HydrateClient state={dehydratedState}>
+                <ProductsList products={products} count={count} page={page} />
+            </HydrateClient>
+        );
+    } catch (error) {
+        throw new Error("Failed to load products. Please try again later.");
+    }
 }
 ```
-- In `src/app/layout.tsx` we could then set up the app for rehydrating the cached products data on the client side this way...
-```tsx
-'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
+-   In `src/app/layout.tsx` we could then set up the app for rehydrating the cached products data on the client side this way...
+
+```tsx
+"use client";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode, useState } from "react";
 ```
+
 ```tsx
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: ReactNode;
+    children: ReactNode;
 }>) {
-  const [queryClient] = useState(() => new QueryClient());
+    const [queryClient] = useState(() => new QueryClient());
 
-  return (
-    <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      {/* If not using Tailwind CSS v4 */}
-      {/* <body className={`${roboto.className} antialiased`}> */}
-      <body className="antialiased">
-        <QueryClientProvider client={queryClient}>
-          <MainNavigation />
-          <div className="max-w-screen-xl mx-auto mt-12 px-4">
-            {children}
-          </div>
-        </QueryClientProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <head>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+                    rel="stylesheet"
+                />
+            </head>
+            {/* If not using Tailwind CSS v4 */}
+            {/* <body className={`${roboto.className} antialiased`}> */}
+            <body className="antialiased">
+                <QueryClientProvider client={queryClient}>
+                    <MainNavigation />
+                    <div className="max-w-screen-xl mx-auto mt-12 px-4">
+                        {children}
+                    </div>
+                </QueryClientProvider>
+            </body>
+        </html>
+    );
 }
 ```
-- __IMPORTANT__: Wrapping part of your app in a client component is fine, but making your `RootLayout` a client component forces everything below it to hydrate (makes everything within a client component)
-- Since it is a bad idea to make `RootLayout` a client component, we implement the hydration setup differently.
-- In `src/components/lib/providers/providers.tsx`
-```tsx
-'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
+-   **IMPORTANT**: Wrapping part of your app in a client component is fine, but making your `RootLayout` a client component forces everything below it to hydrate (makes everything within a client component)
+-   Since it is a bad idea to make `RootLayout` a client component, we implement the hydration setup differently.
+-   In `src/components/lib/providers/providers.tsx`
+
+```tsx
+"use client";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode, useState } from "react";
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+    const [queryClient] = useState(() => new QueryClient());
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+    return (
+        <QueryClientProvider client={queryClient}>
+            {children}
+        </QueryClientProvider>
+    );
 }
 ```
-- In `app/layout.tsx`
+
+-   In `app/layout.tsx`
+
 ```tsx
 // IMPORTANT: No more a client component
 // 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 import type { Metadata } from "next";
 import MainNavigation from "@/components/main-navigation/main-navigation";
 // This instead is a client component
-import Providers from '@/components/lib/providers/providers';
+import Providers from "@/components/lib/providers/providers";
 ```
+
 ```tsx
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: ReactNode;
+    children: ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      {/* If not using Tailwind CSS v4 */}
-      {/* <body className={`${roboto.className} antialiased`}> */}
-      <body className="antialiased">
-        <Providers>
-          <MainNavigation />
-          <div className="max-w-screen-xl mx-auto mt-12 px-4">
-            {children}
-          </div>
-        </Providers>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <head>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+                    rel="stylesheet"
+                />
+            </head>
+            {/* If not using Tailwind CSS v4 */}
+            {/* <body className={`${roboto.className} antialiased`}> */}
+            <body className="antialiased">
+                <Providers>
+                    <MainNavigation />
+                    <div className="max-w-screen-xl mx-auto mt-12 px-4">
+                        {children}
+                    </div>
+                </Providers>
+            </body>
+        </html>
+    );
 }
 ```
-- In `hooks/useProducts.ts`
+
+-   In `hooks/useProducts.ts`
+
 ```ts
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/services/products";
@@ -1662,178 +1774,188 @@ export const useProducts = (page: number = 1) => {
     });
 };
 ```
-- Then in `src/components/products-list/products-list.tsx` do this.
-    - This uses SSG data for page 1 immediately.
-    - Switches to React Query fetching for subsequent page changes.
-    - Avoids flickering or redundant fetch on initial page load.
-```tsx
-'use client';
 
-import { useEffect, useState } from "react"
-import { useProducts } from "@/hooks/useProducts"
-import { IProduct } from "@/types/Product"
-import ProductListItem from "./item/item"
+-   Then in `src/components/products-list/products-list.tsx` do this.
+    -   This uses SSG data for page 1 immediately.
+    -   Switches to React Query fetching for subsequent page changes.
+    -   Avoids flickering or redundant fetch on initial page load.
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useProducts } from "@/hooks/useProducts";
+import { IProduct } from "@/types/Product";
+import ProductListItem from "./item/item";
 
 type Props = {
-  count: number
-  page: number
-  products: IProduct[]
-}
+    count: number;
+    page: number;
+    products: IProduct[];
+};
 
 const ProductsList = ({ count, page, products }: Props) => {
-  const [actualPage, setActualPage] = useState(page)
-  const [actualProducts, setActualProducts] = useState(products)
-  const [actualCount, setActualCount] = useState(count)
-  const [showError, setShowError] = useState(false)
+    const [actualPage, setActualPage] = useState(page);
+    const [actualProducts, setActualProducts] = useState(products);
+    const [actualCount, setActualCount] = useState(count);
+    const [showError, setShowError] = useState(false);
 
-  const { data, isLoading, error } = useProducts(actualPage)
+    const { data, isLoading, error } = useProducts(actualPage);
 
-  useEffect(() => {
-    if (actualPage !== page && data?.message) {
-      setActualProducts(data.message.products)
-      setActualCount(data.message.count)
-    }
-  }, [actualPage, data, page])
+    useEffect(() => {
+        if (actualPage !== page && data?.message) {
+            setActualProducts(data.message.products);
+            setActualCount(data.message.count);
+        }
+    }, [actualPage, data, page]);
 
-  const totalPages = Math.ceil(actualCount / 10)
+    const totalPages = Math.ceil(actualCount / 10);
 
-  return (
-    <div>
-      <h1 className="text-3xl font-semibold mb-4">List of products</h1>
-      <hr className="border-b border-gray-300 mb-6" />
+    return (
+        <div>
+            <h1 className="text-3xl font-semibold mb-4">List of products</h1>
+            <hr className="border-b border-gray-300 mb-6" />
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center mb-6">
-        <nav className="inline-flex rounded-md shadow-sm">
-          {[...Array(totalPages)].map((_, idx) => {
-            const pageNumber = idx + 1
-            return (
-              <button
-                key={pageNumber}
-                onClick={() => setActualPage(pageNumber)}
-                className={`px-4 py-2 border text-sm ${
-                  actualPage === pageNumber
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                }`}
-              >
-                {pageNumber}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
-
-      {/* Loading Spinner (only when changing pages) */}
-      {actualPage !== page && isLoading && (
-        <div className="flex justify-center my-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
-        </div>
-      )}
-
-      {/* Error Snackbar */}
-      {showError && error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 max-w-xl mx-auto">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error.message}</span>
-          <button
-            onClick={() => setShowError(false)}
-            className="absolute top-0 bottom-0 right-0 px-4 py-3"
-          >
-            <svg
-              className="fill-current h-6 w-6 text-red-700"
-              role="button"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <title>Close</title>
-              <path d="M14.348 5.652a1 1 0 10-1.414-1.414L10 7.172 7.066 4.238a1 1 0 00-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 001.414 1.414L10 12.828l2.934 2.934a1 1 0 001.414-1.414L11.414 10l2.934-2.934z" />
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* Product Grid */}
-      {!isLoading && actualProducts.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
-          {actualProducts.map((product) => (
-            <div key={product._id} className="flex items-stretch">
-              <ProductListItem product={product} />
+            {/* Pagination Controls */}
+            <div className="flex justify-center mb-6">
+                <nav className="inline-flex rounded-md shadow-sm">
+                    {[...Array(totalPages)].map((_, idx) => {
+                        const pageNumber = idx + 1;
+                        return (
+                            <button
+                                key={pageNumber}
+                                onClick={() => setActualPage(pageNumber)}
+                                className={`px-4 py-2 border text-sm ${
+                                    actualPage === pageNumber
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                }`}
+                            >
+                                {pageNumber}
+                            </button>
+                        );
+                    })}
+                </nav>
             </div>
-          ))}
+
+            {/* Loading Spinner (only when changing pages) */}
+            {actualPage !== page && isLoading && (
+                <div className="flex justify-center my-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
+                </div>
+            )}
+
+            {/* Error Snackbar */}
+            {showError && error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 max-w-xl mx-auto">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">{error.message}</span>
+                    <button
+                        onClick={() => setShowError(false)}
+                        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    >
+                        <svg
+                            className="fill-current h-6 w-6 text-red-700"
+                            role="button"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                        >
+                            <title>Close</title>
+                            <path d="M14.348 5.652a1 1 0 10-1.414-1.414L10 7.172 7.066 4.238a1 1 0 00-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 001.414 1.414L10 12.828l2.934 2.934a1 1 0 001.414-1.414L11.414 10l2.934-2.934z" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
+            {/* Product Grid */}
+            {!isLoading && actualProducts.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
+                    {actualProducts.map((product) => (
+                        <div key={product._id} className="flex items-stretch">
+                            <ProductListItem product={product} />
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  )
-}
+    );
+};
 
-export default ProductsList
+export default ProductsList;
 ```
 
-- Now the duplicate fetching of products is prevented after the list renders for the first time on the client (keep the network tab open on page load and check for outgoing requests).
+-   Now the duplicate fetching of products is prevented after the list renders for the first time on the client (keep the network tab open on page load and check for outgoing requests).
 
-__NOTE__: When navigating back to page 1, the API call does not go out now. It happens because `actualPage` is `1` when we navigate back to page `1`. Now the condition within the effect function ends up preventing the API call. To overcome this we can use a ref to track the first render.
+**NOTE**: When navigating back to page 1, the API call does not go out now. It happens because `actualPage` is `1` when we navigate back to page `1`. Now the condition within the effect function ends up preventing the API call. To overcome this we can use a ref to track the first render.
+
 ```tsx
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react";
 ```
+
 ```tsx
 const initialRender = useRef(true);
 
-useEffect(
-  () => {
+useEffect(() => {
     if ((!initialRender.current || actualPage !== page) && data?.message) {
-        setActualProducts(data.message.products)
-        setActualCount(data.message.count)
+        setActualProducts(data.message.products);
+        setActualCount(data.message.count);
     }
 
     initialRender.current = false;
-  },
-  [actualPage, data, page]
-)
+}, [actualPage, data, page]);
 ```
-- Check the network tab - you will see that once you visit a page, the network request to fetch data does not go out when you visit the page once again. TanStack Query's caching at work!
 
-### Optional improvement:  Sync actualPage to the URL (query params) for deep linking and SEO
-- In `src/components/products-list/products-list.tsx`
+-   Check the network tab - you will see that once you visit a page, the network request to fetch data does not go out when you visit the page once again. TanStack Query's caching at work!
+
+### Optional improvement: Sync actualPage to the URL (query params) for deep linking and SEO
+
+-   In `src/components/products-list/products-list.tsx`
+
 ```tsx
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 ```
-- Extract page parameter and set `actualPage` based on it
+
+-   Extract page parameter and set `actualPage` based on it
+
 ```tsx
 const router = useRouter();
 const searchParams = useSearchParams();
 
-const pageParam = searchParams.get('page');
+const pageParam = searchParams.get("page");
 const actualPage = useMemo(() => {
-  const num = parseInt(pageParam ?? '1', 10);
-  return isNaN(num) ? 1 : num;
+    const num = parseInt(pageParam ?? "1", 10);
+    return isNaN(num) ? 1 : num;
 }, [pageParam]);
 ```
-- Update URL query param on page change
+
+-   Update URL query param on page change
+
 ```tsx
 const updatePage = (newPage: number) => {
-  const newParams = new URLSearchParams(searchParams.toString());
-  newParams.set('page', String(newPage));
-  router.push(`?${newParams.toString()}`);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("page", String(newPage));
+    router.push(`?${newParams.toString()}`);
 };
 ```
-- Update the pagination handling
+
+-   Update the pagination handling
+
 ```tsx
 <button
-  key={pageNumber}
-  onClick={() => updatePage(pageNumber)}
-  className={`px-4 py-2 border text-sm ${
-    actualPage === pageNumber
-      ? 'bg-blue-600 text-white border-blue-600'
-      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-  }`}
+    key={pageNumber}
+    onClick={() => updatePage(pageNumber)}
+    className={`px-4 py-2 border text-sm ${
+        actualPage === pageNumber
+            ? "bg-blue-600 text-white border-blue-600"
+            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+    }`}
 >
-  {pageNumber}
+    {pageNumber}
 </button>
 ```
 
-__NOTE__: Right now, the backend is not handling query string parameters and the SSG-rendering always renders page 1 of products. This has to be taken care of.
+**NOTE**: Right now, the backend is not handling query string parameters and the SSG-rendering always renders page 1 of products. This has to be taken care of.
 
 ## Step 19: Create the Product Details page
 
@@ -1861,128 +1983,135 @@ export const getProductById = async (_id: string) => {
 -   `src/components/product-detail/product-detail.tsx` - The component rendered by the `ProductDetailsPage`
 
 ```tsx
-import { IProduct } from "@/types/Product"
-import Image from "next/image"
+import { IProduct } from "@/types/Product";
+import Image from "next/image";
 
 type Props = {
-  productId: string | undefined
-  product: IProduct
-}
+    productId: string | undefined;
+    product: IProduct;
+};
 
 const ProductDetail = ({ productId, product }: Props) => {
-  return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        {/* Image Section */}
-        <div className="flex justify-center p-4">
-          <Image
-            src={product.image}
-            alt={product.title}
-            width={320}
-            height={240}
-            className="object-contain"
-          />
+    return (
+        <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                {/* Image Section */}
+                <div className="flex justify-center p-4">
+                    <Image
+                        src={product.image}
+                        alt={product.title}
+                        width={320}
+                        height={240}
+                        className="object-contain"
+                    />
+                </div>
+
+                {/* Content Section */}
+                <div className="md:col-span-2 space-y-4">
+                    <h1 className="text-3xl font-semibold">{product.title}</h1>
+
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span title={product.rating.rate.toFixed(2)}>
+                            ⭐ {product.rating.rate.toFixed(1)}
+                        </span>
+                        <span>({product.rating.count} people rated)</span>
+                    </div>
+
+                    <p className="text-lg text-gray-800">
+                        <strong>Price:</strong> ${product.price}
+                    </p>
+
+                    <p className="text-gray-700">{product.description}</p>
+                </div>
+            </div>
         </div>
+    );
+};
 
-        {/* Content Section */}
-        <div className="md:col-span-2 space-y-4">
-          <h1 className="text-3xl font-semibold">{product.title}</h1>
-
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span title={product.rating.rate.toFixed(2)}>⭐ {product.rating.rate.toFixed(1)}</span>
-            <span>({product.rating.count} people rated)</span>
-          </div>
-
-          <p className="text-lg text-gray-800">
-            <strong>Price:</strong> ${product.price}
-          </p>
-
-          <p className="text-gray-700">{product.description}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default ProductDetail
+export default ProductDetail;
 ```
 
 -   `src/app/products/[id]/page.tsx` - We fetch from the DB directly instead of using `fetch()`
+
 ```tsx
-import { getProductById, getProductIds } from '@/data/services/products';
-import ProductDetail from '@/components/product-detail/product-detail';
-import type { IProduct } from '@/types/Product';
-import type { Metadata } from 'next';
+import { getProductById, getProductIds } from "@/data/services/products";
+import ProductDetail from "@/components/product-detail/product-detail";
+import type { IProduct } from "@/types/Product";
+import type { Metadata } from "next";
 
 type Props = {
-  params: { id: string };
+    params: { id: string };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const product = await getProductById(id);
+    const { id } = await params;
+    const product = await getProductById(id);
 
-  return {
-    title: product?.title ?? 'Product details',
-    description: product?.description ?? '',
-  };
+    return {
+        title: product?.title ?? "Product details",
+        description: product?.description ?? "",
+    };
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { id } = await params;
+    const { id } = await params;
 
-  const product: IProduct = (await getProductById(id));
+    const product: IProduct = await getProductById(id);
 
-  return (
-    <ProductDetail
-      productId={id}
-      product={product}
-    />
-  );
+    return <ProductDetail productId={id} product={product} />;
 }
 ```
 
 -   However after this step we the page is created on the server when the request is made.
 
-- For pages that change very infrequently (eg. product details for products change only once a month on an average, whereas you deploy the multiple times a month), you app can benefit from rendering such pages using a Static Site Generation (SSG) model.
+-   For pages that change very infrequently (eg. product details for products change only once a month on an average, whereas you deploy the multiple times a month), you app can benefit from rendering such pages using a Static Site Generation (SSG) model.
 -   For dynamic routes, Next JS does not know what params (`id` values) exist. It will be unable to generate the pages without the information regarding all possible id values (or at least the ones which are treated as "relevant" enough so as to generate their product detail pages at build time - for example a set of "featured" products).
     -   To overcome this problem, Next JS requires us to define a `generateStaticParams()` function as well for pages with dynamic params.
 -   `src/data/services/products.ts` - Add the service method that returns list of all product ids (at least the ones considered relevant for SSG).
+
 ```tsx
 export const getProductIds = async () => {
     const products = await Product.find().select("_id");
     return products.map((p) => p._id.toString());
 };
 ```
+
 -   `src/app/products/[id]/page.tsx` - Add `generateStaticParams()`
+
 ```tsx
-import { getProductById, getProductIds } from '@/data/services/products';
+import { getProductById, getProductIds } from "@/data/services/products";
 ```
+
 ```tsx
 export async function generateStaticParams() {
-  const ids = await getProductIds();
+    const ids = await getProductIds();
 
-  const idsMap = ids.map((id :number | string) => ({ id: String(id) }))
+    const idsMap = ids.map((id: number | string) => ({ id: String(id) }));
 
-  return idsMap;
+    return idsMap;
 }
 ```
-- For pages that needs to be recreated periodically (once every hour, day etc.), we can benefit from Incremental Static Generation (ISR).
-- ISR in App Router is only triggered by
+
+-   For pages that needs to be recreated periodically (once every hour, day etc.), we can benefit from Incremental Static Generation (ISR).
+-   ISR in App Router is only triggered by
+
 ```ts
 await fetch(..., {
   next: { revalidate: 60 }
 });
 ```
-- But since we are not using `fetch()`, we need to manually opt in using a segment config. Add this instead on top of `src/app/products/[id]/page.tsx`.
+
+-   But since we are not using `fetch()`, we need to manually opt in using a segment config. Add this instead on top of `src/app/products/[id]/page.tsx`.
+
 ```tsx
 export const revalidate = 60;
 ```
 
 If you expect slow first loads, you can create `app/products/[id]/loading.tsx`. This is like `isFallback` in Pages Router, but now you fully control the UI.
+
 ```tsx
 export default function Loading() {
-  return <p>Loading product...</p>;
+    return <p>Loading product...</p>;
 }
 ```
 
@@ -1993,158 +2122,187 @@ export default function Loading() {
 -   `src/components/product-details/product-reviews/product-reviews.tsx` - Create `ProductReviews` component
     -   Create a basic component (left as an exercise)
 -   `src/components/product-details/add-review/add-review.tsx` - Create `AddReview` component
-- `app/products/[id]/layout.tsx`
+-   `app/products/[id]/layout.tsx`
+
 ```tsx
 export const revalidate = 60;
 
-import { getProductById, getProductIds } from '@/data/services/products';
-import ProductDetail from '@/components/product-detail/product-detail';
-import type { IProduct } from '@/types/Product';
-import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import { getProductById, getProductIds } from "@/data/services/products";
+import ProductDetail from "@/components/product-detail/product-detail";
+import type { IProduct } from "@/types/Product";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 type Props = {
-  params: { id: string };
-  children: ReactNode;
+    params: { id: string };
+    children: ReactNode;
 };
 
 export async function generateStaticParams() {
-  const ids = await getProductIds(); // e.g. from DB
-  return ids.map((id) => ({ id: String(id) }));
+    const ids = await getProductIds(); // e.g. from DB
+    return ids.map((id) => ({ id: String(id) }));
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = await getProductById(params.id);
-  return {
-    title: product?.title ?? 'Product details',
-    description: product?.description ?? '',
-  };
+export async function generateMetadata({
+    params,
+}: {
+    params: { id: string };
+}): Promise<Metadata> {
+    const product = await getProductById(params.id);
+    return {
+        title: product?.title ?? "Product details",
+        description: product?.description ?? "",
+    };
 }
 ```
 
-- In `app/products/[id]/page.tsx`
+-   In `app/products/[id]/page.tsx`
+
 ```tsx
-import ProductReviews from '@/components/product-detail/product-reviews/product-reviews';
+import ProductReviews from "@/components/product-detail/product-reviews/product-reviews";
 
 export default function ProductReviewsPage() {
-  return <ProductReviews />;
+    return <ProductReviews />;
 }
 ```
-- In `app/products/[id]/addreview/page.tsx`
+
+-   In `app/products/[id]/addreview/page.tsx`
+
 ```tsx
-import AddReview from '@/components/product-detail/add-review/add-review';
+import AddReview from "@/components/product-detail/add-review/add-review";
 
 export default function AddReviewPage() {
-  return <AddReview />;
+    return <AddReview />;
 }
 ```
+
 -   You will need to manually add `/addreview` at the end of the product details URL to see the component change.
 
 ### Set up a context for passing `reviews` and `productId` down to the child route components
-- In `src/context/product-context.tsx`
-```tsx
-'use client';
 
-import { ReactNode } from 'react';
-import { createContext, useContext } from 'react';
-import { IProduct } from '@/types/Product';
+-   In `src/context/product-context.tsx`
+
+```tsx
+"use client";
+
+import { ReactNode } from "react";
+import { createContext, useContext } from "react";
+import { IProduct } from "@/types/Product";
 
 export type ProductContextValue = {
-  product: IProduct | null,
-  productId: string
-}
+    product: IProduct | null;
+    productId: string;
+};
 
 export const ProductContext = createContext<ProductContextValue | null>(null);
 
 export const useProduct = () => {
-  const context = useContext(ProductContext);
-  if (!context) {
-    throw new Error('useProduct must be used within <ProductContext.Provider>');
-  }
-  return context;
+    const context = useContext(ProductContext);
+    if (!context) {
+        throw new Error(
+            "useProduct must be used within <ProductContext.Provider>"
+        );
+    }
+    return context;
 };
 
 export function ProductProvider({
-  children,
-  value,
+    children,
+    value,
 }: {
-  children: ReactNode;
-  value: ProductContextValue;
+    children: ReactNode;
+    value: ProductContextValue;
 }) {
-  return <ProductContext.Provider value={value}>{children}</ProductContext.Provider>;
+    return (
+        <ProductContext.Provider value={value}>
+            {children}
+        </ProductContext.Provider>
+    );
 }
 ```
-- Update `app/products/[id]/layout.tsx` to provide product
+
+-   Update `app/products/[id]/layout.tsx` to provide product
+
 ```tsx
-import { ProductProvider, ProductContextValue } from '@/context/product-context';
+import {
+    ProductProvider,
+    ProductContextValue,
+} from "@/context/product-context";
 ```
+
 ```tsx
 export default async function ProductLayout({ params, children }: Props) {
-  const { id } = await params;
-  const product: IProduct = await getProductById(id);
+    const { id } = await params;
+    const product: IProduct = await getProductById(id);
 
-  const value : ProductContextValue = {
-    product,
-    productId: id
-  };
+    const value: ProductContextValue = {
+        product,
+        productId: id,
+    };
 
-  return (
-      <ProductProvider value={value}>
-        <ProductDetail product={product} productId={id} />
-        <div className="mt-6">{children}</div>
-      </ProductProvider>
-  );
+    return (
+        <ProductProvider value={value}>
+            <ProductDetail product={product} productId={id} />
+            <div className="mt-6">{children}</div>
+        </ProductProvider>
+    );
 }
 ```
 
 ## Step 21: Render product reviews
 
-- In `components/product-detail/product-reviews/product-reviews.tsx`
-```tsx
-'use client';
+-   In `components/product-detail/product-reviews/product-reviews.tsx`
 
-import { useProduct } from '@/context/product-context';
-import { IReview } from "@/types/Product"
+```tsx
+"use client";
+
+import { useProduct } from "@/context/product-context";
+import { IReview } from "@/types/Product";
 
 const ProductReviews = () => {
-  const { product }  = useProduct();
+    const { product } = useProduct();
 
-  const reviews = product?.reviews as IReview[];
+    const reviews = product?.reviews as IReview[];
 
-  if (!reviews || reviews.length === 0) {
-    return <p>No reviews yet. Be the first one to add a review!</p>
-  }
+    if (!reviews || reviews.length === 0) {
+        return <p>No reviews yet. Be the first one to add a review!</p>;
+    }
 
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-      <ul className="space-y-6">
-        {reviews.map((review) => (
-          <li key={review._id} className="flex items-start space-x-4">
-            {/* Avatar */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-              {review.username.substring(0, 1).toUpperCase()}
-            </div>
+    return (
+        <div>
+            <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+            <ul className="space-y-6">
+                {reviews.map((review) => (
+                    <li key={review._id} className="flex items-start space-x-4">
+                        {/* Avatar */}
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                            {review.username.substring(0, 1).toUpperCase()}
+                        </div>
 
-            {/* Review content */}
-            <div className="flex-1 space-y-2">
-              <div className="text-sm text-gray-500">{new Date(review.date).toDateString().substring(0,10)}</div>
+                        {/* Review content */}
+                        <div className="flex-1 space-y-2">
+                            <div className="text-sm text-gray-500">
+                                {new Date(review.date)
+                                    .toDateString()
+                                    .substring(0, 10)}
+                            </div>
 
-              {/* Simple rating stars using emoji (or swap with custom SVG if desired) */}
-              <div className="flex items-center text-yellow-500 text-sm">
-                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-              </div>
+                            {/* Simple rating stars using emoji (or swap with custom SVG if desired) */}
+                            <div className="flex items-center text-yellow-500 text-sm">
+                                {"★".repeat(review.rating)}
+                                {"☆".repeat(5 - review.rating)}
+                            </div>
 
-              <p className="text-gray-800">{review.text}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+                            <p className="text-gray-800">{review.text}</p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
 
-export default ProductReviews
+export default ProductReviews;
 ```
 
 -   You can now see the product reviews displayed below the product details
@@ -2156,32 +2314,32 @@ export default ProductReviews
 
 ```tsx
 import { useRouter } from "next/router";
+```
 
-// ...code
+```tsx
+const { product, productId } = useProduct();
 
-const ProductReviews = ({ productId, reviews }: Props) => {
-    const router = useRouter();
-    const id = router.query.id as string[];
+// Add this...
+const router = useRouter();
+```
 
-    const navigateToAddReview = () => {
-        router.push(`/products/${id[0]}/addreview`);
-    };
-
-    // ...code
-
-    return (
-        <div>
-            <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-            <button
-                onClick={navigateToAddReview}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded my-6"
-            >
-                Add Review
-            </button>
-            {/* more UI */}
-        </div>
-    );
+```tsx
+const navigateToAddReview = () => {
+    router.push(`/products/${productId}/add`);
 };
+```
+
+```tsx
+<div>
+    <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+    <button
+        onClick={navigateToAddReview}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded my-6"
+    >
+        Add Review
+    </button>
+    {/* more UI */}
+</div>
 ```
 
 ## Step 23: Adding `/auth` to show login page
@@ -2196,251 +2354,248 @@ npm i --force next-auth bcryptjs @types/bcryptjs
 -   `src/components/auth/auth-form.tsx`
 
 ```tsx
-import { useState } from "react"
+"use client";
+
+import { useState } from "react";
 
 function AuthForm() {
-  const [isLogin, setIsLogin] = useState(true)
+    const [isLogin, setIsLogin] = useState(true);
 
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  function switchAuthModeHandler() {
-    setIsLogin((prevState) => !prevState)
-  }
+    function switchAuthModeHandler() {
+        setIsLogin((prevState) => !prevState);
+    }
 
-  return (
-    <section className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">
-      <h1 className="text-2xl font-semibold mb-6 text-center">
-        {isLogin ? "Login" : "Sign Up"}
-      </h1>
+    return (
+        <section className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">
+            <h1 className="text-2xl font-semibold mb-6 text-center">
+                {isLogin ? "Login" : "Sign Up"}
+            </h1>
 
-      <form className="space-y-4">
-        {!isLogin && (
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium mb-1">
-              Username
-            </label>
-            <input
-              required
-              type="text"
-              id="username"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        )}
+            <form className="space-y-4">
+                {!isLogin && (
+                    <div>
+                        <label
+                            htmlFor="username"
+                            className="block text-sm font-medium mb-1"
+                        >
+                            Username
+                        </label>
+                        <input
+                            required
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                )}
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <input
-            required
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+                <div>
+                    <label
+                        htmlFor="email"
+                        className="block text-sm font-medium mb-1"
+                    >
+                        Email
+                    </label>
+                    <input
+                        required
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium mb-1">
-            Password
-          </label>
-          <input
-            required
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+                <div>
+                    <label
+                        htmlFor="password"
+                        className="block text-sm font-medium mb-1"
+                    >
+                        Password
+                    </label>
+                    <input
+                        required
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full max-w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
 
-        <div className="space-y-4">
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition"
-          >
-            {isLogin ? "Login" : "Create Account"}
-          </button>
+                <div className="space-y-4">
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition"
+                    >
+                        {isLogin ? "Login" : "Create Account"}
+                    </button>
 
-          <button
-            type="button"
-            onClick={switchAuthModeHandler}
-            className="w-full text-blue-600 hover:underline text-sm"
-          >
-            {isLogin ? "Create new account" : "Login with existing account"}
-          </button>
-        </div>
-      </form>
-    </section>
-  )
+                    <button
+                        type="button"
+                        onClick={switchAuthModeHandler}
+                        className="w-full text-blue-600 hover:underline text-sm"
+                    >
+                        {isLogin
+                            ? "Create new account"
+                            : "Login with existing account"}
+                    </button>
+                </div>
+            </form>
+        </section>
+    );
 }
 
-export default AuthForm
+export default AuthForm;
 ```
 
--   `src/pages/auth/index.tsx` - Create the page component that shows the auth form
+-   `src/app/auth/page.tsx` - Create the page component that shows the auth form
 
 ```tsx
-import Head from "next/head";
-
+import type { Metadata } from "next";
 import AuthForm from "@/components/auth/auth-form";
 
-export default function AuthPage() {
-    return (
-        <>
-            <Head>
-                <title>Login/Register | Mantra Store</title>
-                <meta
-                    name="description"
-                    content="Login / Register with Mantra Store"
-                />
-            </Head>
+export const metadata: Metadata = {
+    title: "Login/Register | Mantra Store",
+    description: "Login / Register with Mantra Store",
+};
 
-            <AuthForm />
-        </>
-    );
+export default function AuthPage() {
+    return <AuthForm />;
 }
 ```
 
 ## Step 24: Make modifications to the main navigation to show new items based on whether user is logged in or not
 
--   `src/components/main-navigation/main-navigation`
+-   `src/components/main-navigation/user-navigation/user-navigation.tsx`
 
 ```tsx
-import { useState } from "react"
-import Link from "next/link"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+'use client';
+
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const authenticatedUserMenu = [
-  { href: "/profile", text: "Profile" },
-  { href: "/logout", text: "Logout" },
-]
+    { href: "/profile", text: "Profile" },
+    { href: "/logout", text: "Logout" },
+];
 
-const unauthenticatedUserMenu = [
-  { href: "/auth", text: "Login/Register" },
-]
+const unauthenticatedUserMenu = [{ href: "/auth", text: "Login/Register" }];
 
-export default function ResponsiveAppBar() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+export default function UserNavigation() {
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const { data: session, status } = useSession()
-  const router = useRouter()
+    const { data: session, status } = useSession();
+    const router = useRouter();
 
-  const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen)
+    const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
 
-  const handleUserMenuClick = (href: string) => {
-    setUserMenuOpen(false)
-    router.push(href)
-  }
-
-  return (
-    <header className="bg-gray-900 text-white relative z-20">
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold tracking-wide uppercase hidden md:block">
-          Mantra
-        </Link>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden focus:outline-none"
-          aria-label="Toggle menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-6 items-center">
-          <Link href="/products" className="hover:underline">
-            Products
-          </Link>
-          <Link href="/products/add" className="hover:underline">
-            Add a Product
-          </Link>
-
-          {/* Right Auth Avatar */}
-          <div className="relative">
+    const handleUserMenuClick = (href: string) => {
+        setUserMenuOpen(false);
+        router.push(href);
+    };
+    return (
+        <div className="relative">
             <button
-              onClick={toggleUserMenu}
-              className="ml-4 rounded-full bg-gray-700 w-8 h-8 flex items-center justify-center text-sm font-bold"
+                onClick={toggleUserMenu}
+                className="ml-4 rounded-full bg-gray-700 w-8 h-8 flex items-center justify-center text-sm font-bold"
             >
-              {session?.user?.email?.charAt(0).toUpperCase() || "U"}
+                {session?.user?.email?.charAt(0).toUpperCase() ||
+                    "U"}
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg py-1">
-                {(status === "authenticated" ? authenticatedUserMenu : unauthenticatedUserMenu).map((item) => (
-                  <button
-                    key={item.text}
-                    onClick={() => handleUserMenuClick(item.href)}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                  >
-                    {item.text}
-                  </button>
-                ))}
-              </div>
+                <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg py-1">
+                    {(status === "authenticated"
+                        ? authenticatedUserMenu
+                        : unauthenticatedUserMenu
+                    ).map((item) => (
+                        <button
+                            key={item.text}
+                            onClick={() =>
+                                handleUserMenuClick(item.href)
+                            }
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                        >
+                            {item.text}
+                        </button>
+                    ))}
+                </div>
             )}
-          </div>
-        </nav>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {menuOpen && (
-        <div className="md:hidden bg-gray-800 text-white px-4 py-2 space-y-2">
-          <Link
-            href="/products"
-            className="block w-full text-left hover:underline"
-            onClick={() => setMenuOpen(false)}
-          >
-            Products
-          </Link>
-          <Link
-            href="/products/add"
-            className="block w-full text-left hover:underline"
-            onClick={() => setMenuOpen(false)}
-          >
-            Add a Product
-          </Link>
         </div>
-      )}
-    </header>
-  )
+    );
 }
 ```
-- `src/pages/_app.tsx` - In order to use `useSession`, we need to wrap the application in a `SessionProvider` 
+- Include it in `src/components/main-navigation/desktop-navigation/desktop-navigation.tsx`
 ```tsx
-import { SessionProvider } from "next-auth/react"
+import Link from "next/link";
+import UserNavigation from "../user-navigation/user-navigation";
+
+export default function DesktopNav() {
+  return (
+    <nav className="hidden md:flex gap-6">
+      <Link href="/products" className="hover:underline">
+        Products
+      </Link>
+      <Link href="/products/add" className="hover:underline">
+        Add a Product
+      </Link>
+
+      <UserNavigation />
+    </nav>
+  );
+}
+```
+-   `src/lib/providers/providers.tsx` - In order to use `useSession`, we need to wrap the application in a `SessionProvider`
+
+```tsx
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SessionProvider } from 'next-auth/react';
+import { ReactNode, useState } from 'react';
+
+interface Props {
+    children: ReactNode,
+    session: any
+}
+
+export default function Providers({ children, session }: Props) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <SessionProvider session={session}>
+        <QueryClientProvider client={queryClient}>
+        {children}
+        </QueryClientProvider>
+    </SessionProvider>
+  );
+}
+```
+- In `app/layout.tsx`
+```tsx
+import { getServerSession } from 'next-auth';
 ```
 ```tsx
-<SessionProvider session={pageProps.session}>
-    <QueryClientProvider client={queryClient}>
-    {/* rest of UI */}
-    </QueryClientProvider>
-</SessionProvider>
+const session = await getServerSession(/*authOptions*/);
+```
+```tsx
+<Providers session={session}>
+    <MainNavigation />
+    <div className="max-w-screen-xl mx-auto mt-12 px-4">
+        {children}
+    </div>
+</Providers>
 ```
 
 ## Step 25: Set up the User model, and DB services to register a user
@@ -2557,42 +2712,43 @@ import "./models/User";
 -   `src/pages/api/auth/register.ts` - Set up the API to register a new user
 
 ```tsx
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { IUser } from "@/types/User";
-import { IApiResponse, IErrorMessage } from "@/types/api";
-import { register } from "@/data/services/auth";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const handler: NextApiHandler = async (
-    req: NextApiRequest,
-    res: NextApiResponse<IApiResponse<IUser> | IErrorMessage>
-) => {
-    const { method } = req;
+import { register } from '@/data/services/auth';
+import type { IUser } from '@/types/User';
+import type { IApiResponse, IErrorMessage } from '@/types/api';
 
-    switch (method) {
-        case "POST":
-            const user = req.body;
+export async function POST(req: NextRequest) {
+  try {
+    const user: IUser = await req.json();
+    const registeredUser = await register(user);
 
-            try {
-                const registeredUser = await register(user);
-                return res.status(201).json({
-                    status: "success",
-                    message: registeredUser,
-                });
-            } catch (error) {
-                return res.status(500).json({
-                    status: "error",
-                    message: (error as Error).message,
-                });
-            }
-        default:
-            return res.status(405).json({
-                status: "error",
-                message: `METHOD=${method} not allowed`,
-            });
-    }
-};
+    const response: IApiResponse<IUser> = {
+      status: 'success',
+      message: registeredUser,
+    };
 
-export default handler;
+    return NextResponse.json(response, { status: 201 });
+  } catch (error) {
+    const errRes: IErrorMessage = {
+      status: 'error',
+      message: (error as Error).message,
+    };
+
+    return NextResponse.json(errRes, { status: 500 });
+  }
+}
+
+export function GET() {
+  return NextResponse.json(
+    {
+      status: 'error',
+      message: 'METHOD=GET not allowed',
+    },
+    { status: 405 }
+  );
+}
 ```
 
 ## Step 27: Set up frontend service for registration and consume it in the auth-form to enable registration
@@ -2605,7 +2761,8 @@ export type IRegister = Pick<IUser, "email" | "username" | "password">;
 export type ICredentials = Pick<IUser, "email" | "password">;
 ```
 
--   `src/services/auth.ts` - Set up the service method for registration from the frontend. If you ahve not installed axios, do so first
+-   `src/services/auth.ts` - Set up the service method for registration from the frontend. If you have not installed axios, do so first
+
 ```ts
 npm i axios
 ```
@@ -2644,7 +2801,7 @@ export const register = async (credentials: IRegister) => {
 import { register } from "@/services/auth";
 ```
 
--   Add the following method in the compoent
+-   Add the following method in the component
 
 ```tsx
 async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -2674,7 +2831,8 @@ async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
 
 ## Step 28: Create login and other API endpoints using Next Auth
 
-- In `.env` - Add JWT secret key
+-   In `.env` - Add JWT secret key
+
 ```
 NEXTAUTH_SECRET=super_secret_mantra
 ```
@@ -2802,8 +2960,8 @@ export default NextAuth(authOptions);
 -   Add the necessary imports
 
 ```tsx
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/router"
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 ```
 
 -   Get the router for programmatic navigation. Add the code to handle login.
@@ -2824,20 +2982,20 @@ function AuthForm() {
             // login
             if (isLogin) {
                 try {
-                  // login
-                  const result = await signIn("credentials", {
-                    redirect: false,
-                    email,
-                    password,
-                  })
+                    // login
+                    const result = await signIn("credentials", {
+                        redirect: false,
+                        email,
+                        password,
+                    });
 
-                  if (result?.ok && !result.error) {
-                    router.push("/products")
-                  } else {
-                    alert("Login failed")
-                  }
+                    if (result?.ok && !result.error) {
+                        router.push("/products");
+                    } else {
+                        alert("Login failed");
+                    }
                 } catch (error) {
-                  alert((error as Error).message)
+                    alert((error as Error).message);
                 }
             }
         } catch (error) {
@@ -2857,53 +3015,59 @@ function AuthForm() {
 -   Add the necessary imports
 
 ```tsx
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react";
 ```
 
 -   Make code changes to handle click of "Logout"
 
 ```tsx
-const { data: session, status } = useSession()
-const router = useRouter()
+const { data: session, status } = useSession();
+const router = useRouter();
 
 const handleCloseUserMenu = async (event: React.MouseEvent, href?: string) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  setUserMenuOpen(false)
-  setAnchorElUser(null)
+    setUserMenuOpen(false);
+    setAnchorElUser(null);
 
-  console.log('href=', href);
+    console.log("href=", href);
 
-  if (!href) return
+    if (!href) return;
 
-  if (href === "/logout") {
-    await signOut({
-      callbackUrl: "/auth",
-    })
-    // window.location.href = "/auth
-  } else {
-    router.push(href)
-  }
-}
+    if (href === "/logout") {
+        await signOut({
+            callbackUrl: "/auth",
+        });
+        // window.location.href = "/auth
+    } else {
+        router.push(href);
+    }
+};
 ```
+
 ```tsx
-{userMenuOpen && (
-  <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg py-1">
-    {(status === "authenticated" ? authenticatedUserMenu : unauthenticatedUserMenu).map((item) => (
-      <Link
-        href={item.href}
-        key={item.text}
-        onClick={(event) => {
-          handleCloseUserMenu(event, item.href);
-          // handleUserMenuClick(item.href);
-        }}
-        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-      >
-        {item.text}
-      </Link>
-    ))}
-  </div>
-)}
+{
+    userMenuOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg py-1">
+            {(status === "authenticated"
+                ? authenticatedUserMenu
+                : unauthenticatedUserMenu
+            ).map((item) => (
+                <Link
+                    href={item.href}
+                    key={item.text}
+                    onClick={(event) => {
+                        handleCloseUserMenu(event, item.href);
+                        // handleUserMenuClick(item.href);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                >
+                    {item.text}
+                </Link>
+            ))}
+        </div>
+    );
+}
 ```
 
 ## Step 31: Preventing navigation to login page once logged in
@@ -2920,30 +3084,31 @@ import { signIn, getSession } from "next-auth/react";
 
 ```tsx
 // prevent navigation to this page if session exists
-const [isLoading, setIsLoading] = useState(true)
+const [isLoading, setIsLoading] = useState(true);
 
 useEffect(() => {
-  getSession().then((session) => {
-    if (session) {
-      // bad but a temporray fix for router.push() giving problems
-      window.location.href = "/profile"
-    } else {
-      setIsLoading(false)
-    }
-  })
-}, [])
+    getSession().then((session) => {
+        if (session) {
+            // bad but a temporray fix for router.push() giving problems
+            window.location.href = "/profile";
+        } else {
+            setIsLoading(false);
+        }
+    });
+}, []);
 
 if (isLoading) {
-  return (
-    <div className="flex justify-center items-center min-h-screen px-4">
-      Loading...
-    </div>
-  )
+    return (
+        <div className="flex justify-center items-center min-h-screen px-4">
+            Loading...
+        </div>
+    );
 }
 
 // return the actual form UI
 // ...
 ```
+
 ### Step 32: Adding `change-password` API route, and the profile page which enables user to change password in the frontend
 
 -   `src/pages/api/auth/change-password.ts`- Setup as API route to change password (just like user registration, such user management functions are not part of Next Auth)
@@ -3029,95 +3194,103 @@ export async function changePassword(passwordData: IChangePassword) {
 -   `src/components/profile/profile-form.tsx`
 
 ```tsx
-import { useState, useEffect } from "react"
-import { useRouter } from "next/router"
-import { getSession } from "next-auth/react"
-import { changePassword } from "@/services/auth"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { getSession } from "next-auth/react";
+import { changePassword } from "@/services/auth";
 
 export default function ProfileForm() {
-  const router = useRouter()
+    const router = useRouter();
 
-  const [oldPassword, setOldPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (!session) {
-        router.push("/auth")
-      } else {
-        setIsLoading(false)
-      }
-    })
-  }, [router])
+    useEffect(() => {
+        getSession().then((session) => {
+            if (!session) {
+                router.push("/auth");
+            } else {
+                setIsLoading(false);
+            }
+        });
+    }, [router]);
 
-  async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
 
-    try {
-      await changePassword({ oldPassword, newPassword })
-      setOldPassword("")
-      setNewPassword("")
-      alert("Password has been updated")
-    } catch (error) {
-      alert("Password has not been updated")
+        try {
+            await changePassword({ oldPassword, newPassword });
+            setOldPassword("");
+            setNewPassword("");
+            alert("Password has been updated");
+        } catch (error) {
+            alert("Password has not been updated");
+        }
     }
-  }
 
-  if (isLoading) {
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen px-4">
+                Loading...
+            </div>
+        );
+    }
+
     return (
-      <div className="flex justify-center items-center min-h-screen px-4">
-        Loading...
-      </div>
-    )
-  }
+        <section className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+            <h1 className="text-2xl font-semibold mb-6 text-center">
+                Change Password
+            </h1>
 
-  return (
-    <section className="max-w-xl mx-auto p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-semibold mb-6 text-center">Change Password</h1>
+            <form onSubmit={submitHandler} className="space-y-4">
+                <div>
+                    <label
+                        htmlFor="oldPassword"
+                        className="block text-sm font-medium mb-1"
+                    >
+                        Old Password
+                    </label>
+                    <input
+                        required
+                        type="password"
+                        id="oldPassword"
+                        name="oldPassword"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
 
-      <form onSubmit={submitHandler} className="space-y-4">
-        <div>
-          <label htmlFor="oldPassword" className="block text-sm font-medium mb-1">
-            Old Password
-          </label>
-          <input
-            required
-            type="password"
-            id="oldPassword"
-            name="oldPassword"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+                <div>
+                    <label
+                        htmlFor="newPassword"
+                        className="block text-sm font-medium mb-1"
+                    >
+                        New Password
+                    </label>
+                    <input
+                        required
+                        type="password"
+                        id="newPassword"
+                        name="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
 
-        <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium mb-1">
-            New Password
-          </label>
-          <input
-            required
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          >
-            Change password
-          </button>
-        </div>
-      </form>
-    </section>
-  )
+                <div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                    >
+                        Change password
+                    </button>
+                </div>
+            </form>
+        </section>
+    );
 }
 ```
 
@@ -3148,9 +3321,9 @@ export default ProfilePage;
 -   Add the necessary imports
 
 ```tsx
-import { getServerSession } from "next-auth"
-import { authOptions } from "../api/auth/[...nextauth]"
-import { GetServerSidePropsContext } from "next"
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { GetServerSidePropsContext } from "next";
 ```
 
 -   Add session check in `getServerSideProps()`
@@ -3174,23 +3347,30 @@ export const getServerSideProps = async (context: NextPageContext) => {
     };
 };
 ```
+
 ```tsx
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const session = await getServerSession(context.req, context.res, authOptions)
+export const getServerSideProps = async (
+    context: GetServerSidePropsContext
+) => {
+    const session = await getServerSession(
+        context.req,
+        context.res,
+        authOptions
+    );
 
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/auth",
-        permanent: false,
-      },
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/auth",
+                permanent: false,
+            },
+        };
     }
-  }
 
-  return {
-    props: { session },
-  }
-}
+    return {
+        props: { session },
+    };
+};
 ```
 
 ## Step 33: Adding a review
@@ -3227,60 +3407,60 @@ export const createReview = async (_id: string, review: IReview) => {
 -   `src/pages/api/products/[id]/reviews.ts` - Add API for adding a review for a product with given `id`. Note how we protect this API using `getSession()`
 
 ```ts
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
-import { IProduct } from "@/types/Product"
-import { IApiResponse, IErrorMessage } from "@/types/api"
-import { createReview } from "@/data/services/reviews"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]"
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { IProduct } from "@/types/Product";
+import { IApiResponse, IErrorMessage } from "@/types/api";
+import { createReview } from "@/data/services/reviews";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]";
 
 const handler: NextApiHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<IApiResponse<IProduct> | IErrorMessage>
+    req: NextApiRequest,
+    res: NextApiResponse<IApiResponse<IProduct> | IErrorMessage>
 ) => {
-  const { method } = req
+    const { method } = req;
 
-  switch (method) {
-    case "POST": {
-      const session = await getServerSession(req, res, authOptions)
+    switch (method) {
+        case "POST": {
+            const session = await getServerSession(req, res, authOptions);
 
-      if (!session) {
-        return res.status(401).json({
-          status: "error",
-          message: "Not authenticated!",
-        })
-      }
+            if (!session) {
+                return res.status(401).json({
+                    status: "error",
+                    message: "Not authenticated!",
+                });
+            }
 
-      try {
-        const _id = req.query.id as string
-        const review = req.body
+            try {
+                const _id = req.query.id as string;
+                const review = req.body;
 
-        review.username = session.user?.email
-        review.date = new Date().toISOString()
+                review.username = session.user?.email;
+                review.date = new Date().toISOString();
 
-        const reviews = await createReview(_id, review)
+                const reviews = await createReview(_id, review);
 
-        return res.status(201).json({
-          status: "success",
-          message: reviews,
-        })
-      } catch (error) {
-        return res.status(500).json({
-          status: "error",
-          message: (error as Error).message,
-        })
-      }
+                return res.status(201).json({
+                    status: "success",
+                    message: reviews,
+                });
+            } catch (error) {
+                return res.status(500).json({
+                    status: "error",
+                    message: (error as Error).message,
+                });
+            }
+        }
+
+        default:
+            return res.status(405).json({
+                status: "error",
+                message: `METHOD=${method} not allowed`,
+            });
     }
+};
 
-    default:
-      return res.status(405).json({
-        status: "error",
-        message: `METHOD=${method} not allowed`,
-      })
-  }
-}
-
-export default handler
+export default handler;
 ```
 
 -   `src/services/reviews.ts`
@@ -3314,83 +3494,87 @@ export const postReview = async (
 -   `src/components/product-details/add-review/add-review.tsx`
 
 ```tsx
-import { useState } from "react"
-import { useRouter } from "next/router"
-import { postReview } from "@/services/reviews"
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { postReview } from "@/services/reviews";
 
 type Props = {
-  productId: string | undefined
-}
+    productId: string | undefined;
+};
 
 const AddReview = ({ productId }: Props) => {
-  const router = useRouter()
+    const router = useRouter();
 
-  const [rating, setRating] = useState(0)
-  const [text, setText] = useState("")
+    const [rating, setRating] = useState(0);
+    const [text, setText] = useState("");
 
-  const handleAddReview = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    const handleAddReview = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
-    try {
-        if( typeof productId === 'string' ) {
-            await postReview(productId, { rating, text })
-            router.push(`/products/${productId}`)
+        try {
+            if (typeof productId === "string") {
+                await postReview(productId, { rating, text });
+                router.push(`/products/${productId}`);
+            }
+        } catch (error) {
+            alert(`Failed to add review: ${(error as Error).message}`);
         }
-    } catch (error) {
-        alert(`Failed to add review: ${(error as Error).message}`)
-    }
-  }
+    };
 
-  return (
-    <div className="bg-white p-6 rounded-md shadow max-w-xl mx-auto">
-      <h2 className="text-lg font-semibold text-gray-800">Add a review</h2>
-      <hr className="my-4 border-gray-300" />
+    return (
+        <div className="bg-white p-6 rounded-md shadow max-w-xl mx-auto">
+            <h2 className="text-lg font-semibold text-gray-800">
+                Add a review
+            </h2>
+            <hr className="my-4 border-gray-300" />
 
-      <form onSubmit={handleAddReview} className="space-y-4">
-        {/* Star Rating */}
-        <div className="flex space-x-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              className={`text-2xl ${
-                star <= rating ? "text-yellow-400" : "text-gray-300"
-              }`}
-              onClick={() => setRating(star)}
-              aria-label={`${star} star`}
-            >
-              ★
-            </button>
-          ))}
+            <form onSubmit={handleAddReview} className="space-y-4">
+                {/* Star Rating */}
+                <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                            key={star}
+                            type="button"
+                            className={`text-2xl ${
+                                star <= rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                            }`}
+                            onClick={() => setRating(star)}
+                            aria-label={`${star} star`}
+                        >
+                            ★
+                        </button>
+                    ))}
+                </div>
+
+                {/* Text Field */}
+                <div>
+                    <textarea
+                        rows={4}
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Write your review here..."
+                        required
+                    />
+                </div>
+
+                {/* Submit Button */}
+                <div>
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 transition"
+                    >
+                        Add review
+                    </button>
+                </div>
+            </form>
         </div>
+    );
+};
 
-        {/* Text Field */}
-        <div>
-          <textarea
-            rows={4}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Write your review here..."
-            required
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 transition"
-          >
-            Add review
-          </button>
-        </div>
-      </form>
-    </div>
-  )
-}
-
-export default AddReview
+export default AddReview;
 ```
 
 -   `src/components/product-detail/product-detail.tsx` Pass on the `productId` prop to `AddReview`
@@ -3464,68 +3648,68 @@ export const updateCart = async (email: string, cart: IUserCartItem) => {
 -   `src/pages/api/cart/index.ts`
 
 ```tsx
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]"
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]";
 
-import { getCart, updateCart } from "@/data/services/cart"
+import { getCart, updateCart } from "@/data/services/cart";
 
 const handler: NextApiHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse
+    req: NextApiRequest,
+    res: NextApiResponse
 ) => {
-  const { method } = req
+    const { method } = req;
 
-  const session = await getServerSession(req, res, authOptions)
+    const session = await getServerSession(req, res, authOptions);
 
-  if (!session || !session.user) {
-    return res.status(401).json({ message: "Not authenticated!" })
-  }
+    if (!session || !session.user) {
+        return res.status(401).json({ message: "Not authenticated!" });
+    }
 
-  const email = session.user.email as string
+    const email = session.user.email as string;
 
-  switch (method) {
-    case "GET":
-      try {
-        const cart = await getCart(email)
-        return res.status(200).json({
-          status: "success",
-          message: {
-            cart,
-          },
-        })
-      } catch (error) {
-        return res.status(500).json({
-          status: "error",
-          message: (error as Error).message,
-        })
-      }
+    switch (method) {
+        case "GET":
+            try {
+                const cart = await getCart(email);
+                return res.status(200).json({
+                    status: "success",
+                    message: {
+                        cart,
+                    },
+                });
+            } catch (error) {
+                return res.status(500).json({
+                    status: "error",
+                    message: (error as Error).message,
+                });
+            }
 
-    case "PUT":
-      try {
-        const updatedCart = await updateCart(email, req.body)
-        return res.status(200).json({
-          status: "success",
-          message: {
-            cart: updatedCart,
-          },
-        })
-      } catch (error) {
-        return res.status(500).json({
-          status: "error",
-          message: (error as Error).message,
-        })
-      }
+        case "PUT":
+            try {
+                const updatedCart = await updateCart(email, req.body);
+                return res.status(200).json({
+                    status: "success",
+                    message: {
+                        cart: updatedCart,
+                    },
+                });
+            } catch (error) {
+                return res.status(500).json({
+                    status: "error",
+                    message: (error as Error).message,
+                });
+            }
 
-    default:
-      return res.status(405).json({
-        status: "error",
-        message: `METHOD=${method} not allowed`,
-      })
-  }
-}
+        default:
+            return res.status(405).json({
+                status: "error",
+                message: `METHOD=${method} not allowed`,
+            });
+    }
+};
 
-export default handler
+export default handler;
 ```
 
 ## Step 36: Define frontend service methods to work with the cart API (get cart, update cart)
@@ -3657,11 +3841,9 @@ const value = {
 
 ```tsx
 <HydrationBoundary state={pageProps.dehydratedState}>
-  <CartProvider value={value}>
-    <Layout>
-      {/* rest of UI */}
-    </Layout>
-  </CartProvider>
+    <CartProvider value={value}>
+        <Layout>{/* rest of UI */}</Layout>
+    </CartProvider>
 </HydrationBoundary>
 ```
 
@@ -3671,7 +3853,7 @@ const value = {
 -   Add the necessary imports
 
 ```tsx
-import { FaShoppingCart } from "react-icons/fa"
+import { FaShoppingCart } from "react-icons/fa";
 import { useCart } from "@/context/shopping-cart";
 import { getCart } from "@/services/cart";
 import { useEffect } from "react";
@@ -3709,29 +3891,29 @@ useEffect(() => {
 
 ```tsx
 <div className="flex items-center">
-  {/* Cart Icon */}
-  {session && status === "authenticated" && (
-    <div
-      className="relative mr-6 cursor-pointer"
-      onClick={(event) => handleCloseUserMenu(event, "/cart")}
-      aria-label="Go to cart"
-    >
-      <FaShoppingCart className="text-white text-xl" />
-      {cart.length > 0 && (
-        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-          {cart.length}
-        </span>
-      )}
-    </div>
-  )}
+    {/* Cart Icon */}
+    {session && status === "authenticated" && (
+        <div
+            className="relative mr-6 cursor-pointer"
+            onClick={(event) => handleCloseUserMenu(event, "/cart")}
+            aria-label="Go to cart"
+        >
+            <FaShoppingCart className="text-white text-xl" />
+            {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                    {cart.length}
+                </span>
+            )}
+        </div>
+    )}
 
-  {/* Avatar Button */}
-  <button
-    onClick={toggleUserMenu}
-    className="ml-4 rounded-full bg-gray-700 w-8 h-8 flex items-center justify-center text-sm font-bold"
-  >
-    {session?.user?.email?.charAt(0).toUpperCase() || "U"}
-  </button>
+    {/* Avatar Button */}
+    <button
+        onClick={toggleUserMenu}
+        className="ml-4 rounded-full bg-gray-700 w-8 h-8 flex items-center justify-center text-sm font-bold"
+    >
+        {session?.user?.email?.charAt(0).toUpperCase() || "U"}
+    </button>
 </div>
 ```
 
@@ -3744,9 +3926,9 @@ useEffect(() => {
 
 ```tsx
 import { useCart } from "@/context/shopping-cart";
-import { useSession } from "next-auth/react"
+import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { FaShareAlt, FaShoppingCart } from "react-icons/fa"
+import { FaShareAlt, FaShoppingCart } from "react-icons/fa";
 ```
 
 -   Add code to get the `changeQuantity()` method from the shopping cart context. Also get session information using `getSession()` and maintain it in state
@@ -3755,8 +3937,8 @@ import { FaShareAlt, FaShoppingCart } from "react-icons/fa"
 const { changeQuantity } = useCart();
 
 // get session information using useSession(), and maintain the data in state
-const { data: session, status } = useSession()
-const loading = status === "loading"
+const { data: session, status } = useSession();
+const loading = status === "loading";
 ```
 
 -   Add a shopping cart icon (after the ShareIcon) to add the product to the cart if session exists (user is logged in)
@@ -3766,15 +3948,15 @@ const loading = status === "loading"
     /* Add a shopping cart icon to add the product to the cart if session exists (user is logged in) */
 }
 {
-  session && !loading && (
-    <button
-      aria-label="add to cart"
-      onClick={() => changeQuantity(product._id, 1)}
-      className="text-gray-700 hover:text-gray-900 p-2 rounded"
-    >
-      <FaShoppingCart className="text-xl" />
-    </button>
-  )
+    session && !loading && (
+        <button
+            aria-label="add to cart"
+            onClick={() => changeQuantity(product._id, 1)}
+            className="text-gray-700 hover:text-gray-900 p-2 rounded"
+        >
+            <FaShoppingCart className="text-xl" />
+        </button>
+    );
 }
 ```
 
@@ -3795,146 +3977,167 @@ import { ICartItem } from "@/types/Cart";
 import { getCart } from "@/data/services/cart";
 
 type Props = {
-  cart: ICartItem[];
+    cart: ICartItem[];
 };
 
 export default function CartPage({ cart }: Props) {
-  return (
-    <>
-      <Head>
-        <title>Shopping cart | Mantra Store</title>
-        <meta name="description" content="Shopping cart" />
-      </Head>
+    return (
+        <>
+            <Head>
+                <title>Shopping cart | Mantra Store</title>
+                <meta name="description" content="Shopping cart" />
+            </Head>
 
-      <Cart cart={cart} />
-    </>
-  );
+            <Cart cart={cart} />
+        </>
+    );
 }
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+export const getServerSideProps = async (
+    context: GetServerSidePropsContext
+) => {
+    const session = await getServerSession(
+        context.req,
+        context.res,
+        authOptions
+    );
 
-  if (!session || !session.user || !session.user.email) {
+    if (!session || !session.user || !session.user.email) {
+        return {
+            redirect: {
+                destination: "/auth",
+                permanent: false,
+            },
+        };
+    }
+
+    const email = session.user.email;
+    const cart = await getCart(email);
+
     return {
-      redirect: {
-        destination: "/auth",
-        permanent: false,
-      },
+        props: { cart },
     };
-  }
-
-  const email = session.user.email;
-  const cart = await getCart(email);
-
-  return {
-    props: { cart },
-  };
 };
 ```
 
 -   `src/components/cart/cart.tsx` - We create the `Cart` component that is used in the CartPage.
 
 ```tsx
-import { useCart } from "@/context/shopping-cart"
-import { ICartItem } from "@/types/Cart"
-import { IProduct } from "@/types/Product"
-import Image from "next/image"
-import { FaPlus, FaMinus } from "react-icons/fa"
+import { useCart } from "@/context/shopping-cart";
+import { ICartItem } from "@/types/Cart";
+import { IProduct } from "@/types/Product";
+import Image from "next/image";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 type Props = {
-  cart: ICartItem[]
-}
+    cart: ICartItem[];
+};
 
 function Cart({ cart }: Props) {
-  const { changeQuantity } = useCart()
+    const { changeQuantity } = useCart();
 
-  if (!cart || cart.length === 0) {
+    if (!cart || cart.length === 0) {
+        return (
+            <div className="flex justify-center items-center px-4 py-8 text-gray-600">
+                Cart is empty
+            </div>
+        );
+    }
+
+    const total = cart.reduce(
+        (acc, item) => acc + (item.product as IProduct).price * item.quantity,
+        0
+    );
+
     return (
-      <div className="flex justify-center items-center px-4 py-8 text-gray-600">
-        Cart is empty
-      </div>
-    )
-  }
+        <section className="max-w-6xl mx-auto px-4 py-6">
+            <h1 className="text-2xl font-semibold mb-4">Shopping cart</h1>
+            <hr className="mb-6 border-gray-300" />
 
-  const total = cart.reduce(
-    (acc, item) => acc + (item.product as IProduct).price * item.quantity,
-    0
-  )
-
-  return (
-    <section className="max-w-6xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-semibold mb-4">Shopping cart</h1>
-      <hr className="mb-6 border-gray-300" />
-
-      <div className="overflow-x-auto rounded shadow border border-gray-200">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-100 border-b">
-            <tr className="text-sm font-medium text-gray-700 text-left">
-              <th className="py-3 px-4 text-center">S. No.</th>
-              <th className="py-3 px-4">Image</th>
-              <th className="py-3 px-4">Name</th>
-              <th className="py-3 px-4 text-center">Quantity</th>
-              <th className="py-3 px-4 text-right">Price ($)</th>
-              <th className="py-3 px-4 text-right">Total Price ($)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cart.map(({ product, quantity }: any, idx: number) => (
-              <tr key={product._id} className="border-b hover:bg-gray-50 text-sm">
-                <td className="py-3 px-4 text-center">{idx + 1}</td>
-                <td className="py-3 px-4">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    width={48}
-                    height={48}
-                  />
-                </td>
-                <td className="py-3 px-4">{product.title}</td>
-                <td className="py-3 px-4 text-center">
-                  <button
-                    aria-label="decrease quantity"
-                    className="text-green-600 hover:text-green-800 mr-2"
-                    onClick={async () => {
-                      await changeQuantity(product._id, -1)
-                      window.location.reload()
-                    }}
-                  >
-                    <FaMinus />
-                  </button>
-                  {quantity}
-                  <button
-                    aria-label="increase quantity"
-                    className="text-green-600 hover:text-green-800 ml-2"
-                    onClick={async () => {
-                      await changeQuantity(product._id, 1)
-                      window.location.reload()
-                    }}
-                  >
-                    <FaPlus />
-                  </button>
-                </td>
-                <td className="py-3 px-4 text-right">
-                  {product.price.toFixed(2)}
-                </td>
-                <td className="py-3 px-4 text-right">
-                  {(quantity * product.price).toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="bg-gray-50 text-sm font-medium text-gray-700 border-t">
-              <td colSpan={4} />
-              <td className="py-3 px-4 text-right">Total</td>
-              <td className="py-3 px-4 text-right">{total.toFixed(2)}</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </section>
-  )
+            <div className="overflow-x-auto rounded shadow border border-gray-200">
+                <table className="min-w-full bg-white">
+                    <thead className="bg-gray-100 border-b">
+                        <tr className="text-sm font-medium text-gray-700 text-left">
+                            <th className="py-3 px-4 text-center">S. No.</th>
+                            <th className="py-3 px-4">Image</th>
+                            <th className="py-3 px-4">Name</th>
+                            <th className="py-3 px-4 text-center">Quantity</th>
+                            <th className="py-3 px-4 text-right">Price ($)</th>
+                            <th className="py-3 px-4 text-right">
+                                Total Price ($)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {cart.map(({ product, quantity }: any, idx: number) => (
+                            <tr
+                                key={product._id}
+                                className="border-b hover:bg-gray-50 text-sm"
+                            >
+                                <td className="py-3 px-4 text-center">
+                                    {idx + 1}
+                                </td>
+                                <td className="py-3 px-4">
+                                    <Image
+                                        src={product.image}
+                                        alt={product.title}
+                                        width={48}
+                                        height={48}
+                                    />
+                                </td>
+                                <td className="py-3 px-4">{product.title}</td>
+                                <td className="py-3 px-4 text-center">
+                                    <button
+                                        aria-label="decrease quantity"
+                                        className="text-green-600 hover:text-green-800 mr-2"
+                                        onClick={async () => {
+                                            await changeQuantity(
+                                                product._id,
+                                                -1
+                                            );
+                                            window.location.reload();
+                                        }}
+                                    >
+                                        <FaMinus />
+                                    </button>
+                                    {quantity}
+                                    <button
+                                        aria-label="increase quantity"
+                                        className="text-green-600 hover:text-green-800 ml-2"
+                                        onClick={async () => {
+                                            await changeQuantity(
+                                                product._id,
+                                                1
+                                            );
+                                            window.location.reload();
+                                        }}
+                                    >
+                                        <FaPlus />
+                                    </button>
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                    {product.price.toFixed(2)}
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                    {(quantity * product.price).toFixed(2)}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                    <tfoot>
+                        <tr className="bg-gray-50 text-sm font-medium text-gray-700 border-t">
+                            <td colSpan={4} />
+                            <td className="py-3 px-4 text-right">Total</td>
+                            <td className="py-3 px-4 text-right">
+                                {total.toFixed(2)}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+    );
 }
 
-export default Cart
+export default Cart;
 ```

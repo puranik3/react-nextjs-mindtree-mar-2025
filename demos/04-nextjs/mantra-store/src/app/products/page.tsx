@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic';
+
 import type { Metadata } from "next";
 // import { notFound } from "next/navigation";
 
@@ -19,7 +21,9 @@ export default async function ProductsPage() {
     } = await getProducts();
 
     // simulating an error
-    // throw new Error('Ooops');
+    // if( Math.random() < 0.5 ) {
+      throw new Error('Ooops');
+    // }
 
     return <ProductsList
         products={products}

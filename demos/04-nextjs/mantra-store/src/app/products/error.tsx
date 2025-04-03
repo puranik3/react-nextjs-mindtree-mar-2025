@@ -15,7 +15,13 @@ export default function Error({ error, reset }: Props) {
       <hr />
 
       <p>{error.message}</p>
-      <button onClick={reset}>Try again</button>
+      <button className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition" onClick={() => {
+        if (typeof window !== 'undefined') {
+          location.reload(); // fallback full reload
+        } else {
+          reset(); // still try this first
+        }
+      }}>Try again</button>
     </div>
   );
 }
