@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+// define Mongoose models by importing them
+import "./models/Product";
+// ...import any models you create in future here
+
 export const connect = async () => {
     const connectionStr =
         process.env.DATABASE_CONNECTION_STRING ||
