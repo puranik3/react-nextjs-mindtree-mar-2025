@@ -7,6 +7,9 @@ import ProductsList from "@/components/products-list/products-list";
 import { getProducts } from "@/data/services/products";
 import type { IProduct } from "@/types/Product";
 
+import HydrateClient from "@/components/lib/react-query/hydrate-client";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+
 export const metadata : Metadata = {
   title: "List of products",
   description: "Mantra Store - search through our variety of products.",
@@ -14,22 +17,37 @@ export const metadata : Metadata = {
 
 export default async function ProductsPage() {
   try {
+    // SSG with React Query hydration
+    const queryClient = new QueryClient();
+
+    // Preload the page=1 data into React Query's cache
+    await queryClient.prefetchQuery({
+      queryKey: ["products", 1],
+      queryFn: () => getProducts(1),
+    });
+
     const { count, page, products }: {
       count: number;
       page: number;
       products: IProduct[];
-    } = await getProducts();
+    } = await getProducts(1);
+
+    const dehydratedState = dehydrate(queryClient);
 
     // simulating an error
     // if( Math.random() < 0.5 ) {
     //    throw new Error('Ooops');
     // }
 
-    return <ProductsList
-        products={products}
-        count={count}
-        page={page}
-      />;
+    return (
+      <HydrateClient state={dehydratedState}>
+        <ProductsList
+          products={products}
+          count={count}
+          page={page}
+        />
+      </HydrateClient>
+    );
   } catch (error) {
       // console.error("Failed to load products:", (error as Error).message);
       // Option 1: Render a fallback UI - Graceful Fallback UI that shows up on /products route in the client

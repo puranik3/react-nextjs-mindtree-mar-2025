@@ -12,7 +12,9 @@ type IGetProductsResponse = {
 export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
     // const res = await fetch(`/api/products?page=${page}`)
 
-    // NOTE: process.env.NEXT_PUBLIC_SITE_URL -> Needs dev server to be running during build to work. Work around @todo -> SSG in `app/products/page.tsx` needs to fetch from DB service rather than this frontend API service, but yet construct cached response for frontend in this response format - i.e. { status: 'success', message: { count, page, products } }
+    // Frotend fetch() - This fetch() IS NOT MODIFIED by Next JS
+    //      - same as the browser fetch()
+    // Backend fetch() - This fetch IS MODIFIED by Next JS
     const res = await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL}/api/products?page=${page}`
     );
