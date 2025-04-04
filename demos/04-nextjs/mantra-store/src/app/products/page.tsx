@@ -1,7 +1,7 @@
 // export const dynamic = 'force-dynamic';
 
 import type { Metadata } from "next";
-// import { notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import ProductsList from "@/components/products-list/products-list";
 import { getProducts } from "@/data/services/products";
@@ -22,7 +22,7 @@ export default async function ProductsPage() {
 
     // simulating an error
     // if( Math.random() < 0.5 ) {
-      throw new Error('Ooops');
+    //    throw new Error('Ooops');
     // }
 
     return <ProductsList
@@ -37,10 +37,10 @@ export default async function ProductsPage() {
 
       // Option 2: Interrupts rendering and bubbles up to error boundaries
       // go to the closest `error.tsx` boundary (or the root one) - Error page gets access to the error and reset method to retry page rendering and is a client component
-      throw new Error("Failed to load products. Please try again later.");
+      // throw new Error("Failed to load products. Please try again later.");
 
       // Option 3
       // trigger the /app/not-found.tsx route (if defined) - Not Found page does not get access to the error and is a server component
-      // notFound(); // if you want to mimic `return { notFound: true }`
+      notFound(); // if you want to mimic `return { notFound: true }`
   }
 }
