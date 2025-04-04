@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { IProduct } from "@/types/Product";
 import ProductListItem from "./item/item";
-import { getProducts } from "@/services/products";
 import { useProducts } from "@/hooks/useProducts";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
     count: number;
@@ -13,22 +13,55 @@ type Props = {
 };
 
 const ProductsList = ({ products, count, page }: Props) => {
-    const [actualPage, setActualPage] = useState(page);
+    const initialRender = useRef(true); // initialRender.current = true
+
+    // const [actualPage, setActualPage] = useState(page);
     const [actualCount, setActualCount] = useState(count);
     const [actualProducts, setActualProducts] = useState(products);
 
+    const router = useRouter();
+
+    const searchParams = useSearchParams();
+
+    const pageParam = searchParams.get("page");
+
+    const num = parseInt(pageParam ?? "1", 10);
+    const actualPage = isNaN(num) ? 1 : num;
+
+    // const actualPage = useMemo(
+    //     () => {
+    //         const num = parseInt(pageParam ?? "1", 10);
+    //         return isNaN(num) ? 1 : num;
+    //     },
+    //     [pageParam]
+    // );
+
+    // when we move from one page to another, actualPage state is set, and the components re-renders - this line will then fetch data afresh (or from the cache if exists and valid)
+    // TanStack's useQuery() makes the call to the API (or returns cached data if valid) - it maintains and sets the states as well (isLoading, error)
     const { data, isLoading, error } = useProducts(actualPage);
 
     const [showError, setShowError] = useState(false);
 
-    useEffect(() => {
-        if (actualPage !== page && data?.message) {
-            setActualProducts(data.message.products);
-            setActualCount(data.message.count);
-        }
-    }, [actualPage, data, page]);
+    // This useEffect() is NOT for API calls anymore - it is simply to set the other state variables (products, count) from the data obtained from useProducts()
+    useEffect(
+        () => {
+            if ((!initialRender.current || actualPage !== page) && data?.message) {
+                setActualProducts(data.message.products);
+                setActualCount(data.message.count);
+            }
+
+            initialRender.current = false;
+        },
+        [actualPage, data, page]
+    );
 
     const totalPages = Math.ceil(actualCount / 10);
+
+    const updatePage = (newPage: number) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set("page", String(newPage));
+        router.push(`?${newParams.toString()}`);
+    };
 
     return (
         <>
@@ -43,7 +76,7 @@ const ProductsList = ({ products, count, page }: Props) => {
                         return (
                             <button
                                 key={pageNumber}
-                                onClick={() => setActualPage(pageNumber)}
+                                onClick={() => updatePage(pageNumber)}
                                 className={`px-4 py-2 border text-sm ${
                                     actualPage === pageNumber
                                         ? "bg-blue-600 text-white border-blue-600"
