@@ -46,7 +46,7 @@ export default async function ProductsPage() {
           count={count}
           page={page}
         />
-      </HydrateClient>
+        </HydrateClient>
     );
   } catch (error) {
       // console.error("Failed to load products:", (error as Error).message);

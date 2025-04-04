@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { IProduct } from "@/types/Product";
 import ProductListItem from "./item/item";
 import { getProducts } from "@/services/products";
+import { useProducts } from "@/hooks/useProducts";
 
 type Props = {
     count: number;
@@ -16,32 +17,16 @@ const ProductsList = ({ products, count, page }: Props) => {
     const [actualCount, setActualCount] = useState(count);
     const [actualProducts, setActualProducts] = useState(products);
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
+    const { data, isLoading, error } = useProducts(actualPage);
 
     const [showError, setShowError] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const {
-                    message: { products, count },
-                } = await getProducts(actualPage);
-                setActualProducts(products);
-                setActualCount(count);
-                setError(null);
-                setShowError(false);
-            } catch (err) {
-                setError(err as Error);
-                setShowError(true);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProducts();
-    }, [actualPage]);
+        if (actualPage !== page && data?.message) {
+            setActualProducts(data.message.products);
+            setActualCount(data.message.count);
+        }
+    }, [actualPage, data, page]);
 
     const totalPages = Math.ceil(actualCount / 10);
 
@@ -73,7 +58,7 @@ const ProductsList = ({ products, count, page }: Props) => {
             </div>
 
             {/* Loading Spinner */}
-            {loading && (
+            {isLoading && (
                 <div className="flex justify-center my-10">
                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600" />
                 </div>
@@ -101,7 +86,7 @@ const ProductsList = ({ products, count, page }: Props) => {
                 </div>
             )}
 
-            {!loading && !error && (
+            {!isLoading && !error && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
                     {
                         actualProducts.map((product) => (
