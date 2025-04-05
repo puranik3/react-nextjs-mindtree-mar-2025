@@ -2427,6 +2427,38 @@ export interface IChangePassword {
 }
 ```
 
+
+- Customize NextAuth's `Session`, `User` and `JWT` interfaces (by using the declaration merging feature of TypeScript interfaces). In `types/next-auth.d.ts`
+```ts
+// types/next-auth.d.ts
+import NextAuth from "next-auth";
+
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            username: string;
+            email: string;
+            role?: string;
+        };
+    }
+
+    interface User {
+        id: string;
+        username: string;
+        role?: string;
+    }
+}
+
+declare module "next-auth/jwt" {
+    interface JWT {
+        id: string;
+        username: string;
+        role?: string;
+    }
+}
+```
+
 -   `src/pages/api/auth/[...nextauth].ts` - Setup API routes for auth through Next Auth
 
 ```tsx

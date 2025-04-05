@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IProduct } from "@/types/Product";
 import ProductListItem from "./item/item";
 import { useProducts } from "@/hooks/useProducts";
@@ -50,6 +50,8 @@ const ProductsList = ({ products, count, page }: Props) => {
                 setActualCount(data.message.count);
             }
 
+            // console.log('data = ', data);
+            // console.log(initialRender);
             initialRender.current = false;
         },
         [actualPage, data, page]
