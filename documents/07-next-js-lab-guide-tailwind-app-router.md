@@ -2846,112 +2846,116 @@ export interface IChangePassword {
 }
 ```
 
--   `src/pages/api/auth/[...nextauth].ts` - Setup API routes for auth through Next Auth
+- Customize NextAuth's `Session`, `User` and `JWT` interfaces (by using the declaration merging feature of TypeScript interfaces). In `types/next-auth.d.ts`
+```ts
+// types/next-auth.d.ts
+import NextAuth from "next-auth";
 
-```tsx
-import NextAuth, {
-    Account,
-    AuthOptions,
-    Session,
-    User as NextAuthUser,
-} from "next-auth";
-import { JWT } from "next-auth/jwt";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import mongoose from "@/data/init";
-// import { ICredentials } from "@/types/User";
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            username: string;
+            email: string;
+            role?: string;
+        };
+    }
 
-const User = mongoose.model("User");
+    interface User {
+        id: string;
+        username: string;
+        role?: string;
+    }
+}
 
-console.log("User", User);
+declare module "next-auth/jwt" {
+    interface JWT {
+        id: string;
+        username: string;
+        role?: string;
+    }
+}
+```
+
+-   `app/api/auth/[...nextauth]/route.ts` - Setup API routes for auth through Next Auth
+
+```ts
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
+import mongoose from '@/data/init';
+import type { AuthOptions } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
+import type { Account, Session, User as NextAuthUser } from 'next-auth';
+
+const User = mongoose.model('User');
 
 export const authOptions: AuthOptions = {
-    providers: [
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" },
-            },
-            async authorize(credentials) {
-                if (
-                    !credentials ||
-                    !credentials.email ||
-                    !credentials.password
-                ) {
-                    throw new Error("Missing email or password");
-                }
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Missing email or password');
+        }
 
-                const { email, password } = credentials;
+        const user = await User.findOne({ email: credentials.email });
 
-                const user = await User.findOne({ email });
+        if (!user) {
+          throw new Error('User not found');
+        }
 
-                if (!user) {
-                    throw new Error("User not found");
-                }
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
-                const isPasswordValid = await bcrypt.compare(
-                    password,
-                    user.password
-                );
+        if (!isPasswordValid) {
+          throw new Error('Invalid password');
+        }
 
-                if (!isPasswordValid) {
-                    throw new Error("Invalid password");
-                }
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          name: user.username,
+          image: null,
+        };
+      },
+    }),
+  ],
 
-                return {
-                    id: user._id.toString(),
-                    email: user.email,
-                    username: user.username,
-                    role: user.role,
-                    name: user.username,
-                    image: null,
-                };
-            },
-        }),
-    ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 60 * 60 * 24 * 30,
+  },
 
-    session: {
-        strategy: "jwt",
-        maxAge: 60 * 60 * 24 * 30,
+  callbacks: {
+    async jwt({ token, user, account }: { token: JWT; user?: NextAuthUser; account?: Account | null }) {
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+        token.role = user.role;
+      }
+      return token;
     },
 
-    callbacks: {
-        async jwt({
-            token,
-            user,
-            account,
-        }: {
-            token: JWT;
-            user?: NextAuthUser;
-            account?: Account | null;
-        }): Promise<JWT> {
-            if (user) {
-                token.id = user.id;
-                token.username = user.username;
-                token.role = user.role;
-            }
-            return token;
-        },
-
-        async session({
-            session,
-            token,
-        }: {
-            session: Session;
-            token: JWT;
-        }): Promise<Session> {
-            if (session.user) {
-                session.user.id = token.id as string;
-                session.user.username = token.username as string;
-                session.user.role = token.role as string;
-            }
-            return session;
-        },
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.role = token.role as string;
+      }
+      return session;
     },
+  },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
 ```
 
 ## Step 29: Implement login in the frontend
@@ -2960,8 +2964,8 @@ export default NextAuth(authOptions);
 -   Add the necessary imports
 
 ```tsx
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/router";
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 ```
 
 -   Get the router for programmatic navigation. Add the code to handle login.
@@ -2981,21 +2985,17 @@ function AuthForm() {
 
             // login
             if (isLogin) {
-                try {
-                    // login
-                    const result = await signIn("credentials", {
-                        redirect: false,
-                        email,
-                        password,
-                    });
+                // login
+                const result = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                })
 
-                    if (result?.ok && !result.error) {
-                        router.push("/products");
-                    } else {
-                        alert("Login failed");
-                    }
-                } catch (error) {
-                    alert((error as Error).message);
+                if (result?.ok && !result.error) {
+                    router.push("/products")
+                } else {
+                    alert("Login failed")
                 }
             }
         } catch (error) {
@@ -3011,7 +3011,7 @@ function AuthForm() {
 
 ## Step 30: Handling logout
 
--   `src/components/main-navigation/main-navigation.tsx`
+-   `src/components/main-navigation/user-navigation/user-navigation.tsx`
 -   Add the necessary imports
 
 ```tsx
@@ -3020,6 +3020,11 @@ import { useSession, signOut } from "next-auth/react";
 
 -   Make code changes to handle click of "Logout"
 
+```tsx
+const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(
+    null
+)
+```
 ```tsx
 const { data: session, status } = useSession();
 const router = useRouter();
@@ -3090,7 +3095,8 @@ useEffect(() => {
     getSession().then((session) => {
         if (session) {
             // bad but a temporray fix for router.push() giving problems
-            window.location.href = "/profile";
+            // window.location.href = "/profile";
+            router.push('/profile');
         } else {
             setIsLoading(false);
         }
@@ -3111,37 +3117,39 @@ if (isLoading) {
 
 ### Step 32: Adding `change-password` API route, and the profile page which enables user to change password in the frontend
 
--   `src/pages/api/auth/change-password.ts`- Setup as API route to change password (just like user registration, such user management functions are not part of Next Auth)
+-   `src/app/api/auth/change-password/route.ts`- Setup as API route to change password (just like user registration, such user management functions are not part of Next Auth)
 -   **Note**: This API is protected (user needs to be authentcated in order to use this API). Such API protection is enabled using getSession() of Next Auth - yes, this method works on the client-side as well as the server-side.
 
 ```tsx
-import mongoose from "@/data/init";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import bcrypt from "bcryptjs";
+import mongoose from "@/data/init";
 
 const User = mongoose.model("User");
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== "PATCH") {
-        return res.status(405).json({ message: "Method Not Allowed" });
-    }
-
-    const session = await getServerSession(req, res, authOptions);
-
-    if (!session) {
-        return res.status(401).json({ message: "Not authenticated!" });
-    }
-
-    const email = session.user?.email;
-    const { oldPassword, newPassword } = req.body;
-
+export async function PATCH(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user?.email) {
+            return NextResponse.json(
+                { message: "Not authenticated!" },
+                { status: 401 }
+            );
+        }
+
+        const email = session.user.email;
+        const { oldPassword, newPassword } = await req.json();
+
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: "User not found!" });
+            return NextResponse.json(
+                { message: "User not found!" },
+                { status: 404 }
+            );
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -3150,22 +3158,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         );
 
         if (!isPasswordValid) {
-            return res.status(403).json({ message: "Invalid password!" });
+            return NextResponse.json(
+                { message: "Invalid password!" },
+                { status: 403 }
+            );
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         await User.findOneAndUpdate({ email }, { password: hashedPassword });
 
-        res.status(200).json({ message: "Password updated successfully!" });
+        return NextResponse.json({ message: "Password updated successfully!" });
     } catch (error) {
-        res.status(500).json({ message: "An error occurred!" });
+        return NextResponse.json(
+            { message: "An error occurred!" },
+            { status: 500 }
+        );
     }
 }
 
-export default handler;
+export function GET() {
+    return NextResponse.json(
+        { message: "Method Not Allowed" },
+        { status: 405 }
+    );
+}
 ```
-
 -   `src/services/auth.ts` - Add a frontend API service method used to call this API. Note that the necessary type was created earlier as part of another unrelated step.
 
 ```tsx
@@ -3194,183 +3212,291 @@ export async function changePassword(passwordData: IChangePassword) {
 -   `src/components/profile/profile-form.tsx`
 
 ```tsx
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { getSession } from "next-auth/react";
-import { changePassword } from "@/services/auth";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
+import { changePassword } from '@/services/auth';
 
 export default function ProfileForm() {
-    const router = useRouter();
+  const router = useRouter();
 
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        getSession().then((session) => {
-            if (!session) {
-                router.push("/auth");
-            } else {
-                setIsLoading(false);
-            }
-        });
-    }, [router]);
+  useEffect(() => {
+    getSession().then((session) => {
+      if (!session) {
+        router.push('/auth');
+      } else {
+        setIsLoading(false);
+      }
+    });
+  }, [router]);
 
-    async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+  async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-        try {
-            await changePassword({ oldPassword, newPassword });
-            setOldPassword("");
-            setNewPassword("");
-            alert("Password has been updated");
-        } catch (error) {
-            alert("Password has not been updated");
-        }
+    try {
+      await changePassword({ oldPassword, newPassword });
+      setOldPassword('');
+      setNewPassword('');
+      alert('Password has been updated');
+    } catch (error) {
+      alert('Password has not been updated');
     }
+  }
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen px-4">
-                Loading...
-            </div>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <section className="max-w-xl mx-auto p-6 bg-white rounded shadow">
-            <h1 className="text-2xl font-semibold mb-6 text-center">
-                Change Password
-            </h1>
-
-            <form onSubmit={submitHandler} className="space-y-4">
-                <div>
-                    <label
-                        htmlFor="oldPassword"
-                        className="block text-sm font-medium mb-1"
-                    >
-                        Old Password
-                    </label>
-                    <input
-                        required
-                        type="password"
-                        id="oldPassword"
-                        name="oldPassword"
-                        value={oldPassword}
-                        onChange={(e) => setOldPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label
-                        htmlFor="newPassword"
-                        className="block text-sm font-medium mb-1"
-                    >
-                        New Password
-                    </label>
-                    <input
-                        required
-                        type="password"
-                        id="newPassword"
-                        name="newPassword"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                    >
-                        Change password
-                    </button>
-                </div>
-            </form>
-        </section>
+      <div className="flex justify-center items-center min-h-screen px-4">
+        Loading...
+      </div>
     );
+  }
+
+  return (
+    <section className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+      <h1 className="text-2xl font-semibold mb-6 text-center">
+        Change Password
+      </h1>
+
+      <form onSubmit={submitHandler} className="space-y-4">
+        <div>
+          <label htmlFor="oldPassword" className="block text-sm font-medium mb-1">
+            Old Password
+          </label>
+          <input
+            required
+            type="password"
+            id="oldPassword"
+            name="oldPassword"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="newPassword" className="block text-sm font-medium mb-1">
+            New Password
+          </label>
+          <input
+            required
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          >
+            Change password
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+```
+- Now we show inline error/success messages and add Zod validation to the form
+```sh
+npm i zod
+```
+- Make these changes in `src/components/profile/profile-form.tsx`
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSession } from 'next-auth/react';
+import { changePassword } from '@/services/auth';
+import { z } from 'zod';
+
+const passwordSchema = z.object({
+  oldPassword: z.string().min(6, 'Old password must be at least 8 characters'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+});
+
+export default function ProfileForm() {
+  const router = useRouter();
+
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
+  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (!session) {
+        router.push('/auth');
+      } else {
+        setIsLoading(false);
+      }
+    });
+  }, [router]);
+
+  async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setFormError(null);
+    setSuccessMessage(null);
+    setFieldErrors({});
+
+    const validation = passwordSchema.safeParse({ oldPassword, newPassword });
+
+    if (!validation.success) {
+      const zodErrors = validation.error.flatten().fieldErrors;
+      setFieldErrors({
+        oldPassword: zodErrors.oldPassword?.[0] || '',
+        newPassword: zodErrors.newPassword?.[0] || '',
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await changePassword({ oldPassword, newPassword });
+      setSuccessMessage('Password has been updated!');
+      setOldPassword('');
+      setNewPassword('');
+    } catch (error) {
+      setFormError('Failed to update password. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen px-4">
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+    <section className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+      <h1 className="text-2xl font-semibold mb-6 text-center">
+        Change Password
+      </h1>
+
+      <form onSubmit={submitHandler} className="space-y-4">
+        {formError && (
+          <div className="text-red-600 text-sm font-medium">{formError}</div>
+        )}
+        {successMessage && (
+          <div className="text-green-600 text-sm font-medium">{successMessage}</div>
+        )}
+
+        <div>
+          <label htmlFor="oldPassword" className="block text-sm font-medium mb-1">
+            Old Password
+          </label>
+          <input
+            required
+            type="password"
+            id="oldPassword"
+            name="oldPassword"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {fieldErrors.oldPassword && (
+            <p className="text-sm text-red-500 mt-1">{fieldErrors.oldPassword}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="newPassword" className="block text-sm font-medium mb-1">
+            New Password
+          </label>
+          <input
+            required
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {fieldErrors.newPassword && (
+            <p className="text-sm text-red-500 mt-1">{fieldErrors.newPassword}</p>
+          )}
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full text-white py-2 rounded transition ${
+              isSubmitting
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {isSubmitting ? 'Updating...' : 'Change password'}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+```
+-   `src/app/profile/page.tsx` - Create the page component that renders the profile form component
+
+```tsx
+import type { Metadata } from 'next';
+import ProfileForm from '@/components/profile/profile-form';
+
+export const metadata: Metadata = {
+  title: 'My profile',
+  description: 'User profile information',
+};
+
+export default function ProfilePage() {
+  return <ProfileForm />;
 }
 ```
 
--   `src/pages/profile/index.tsx` - Create the page component that renders the profile form component
-
-```tsx
-import Head from "next/head";
-import ProfileForm from "@/components/profile/profile-form";
-
-const ProfilePage = () => {
-    return (
-        <>
-            <Head>
-                <title>My profile</title>
-                <meta name="description" content="User profile information" />
-            </Head>
-
-            <ProfileForm />
-        </>
-    );
-};
-
-export default ProfilePage;
-```
-
--   An additional way to prevent navigation to a route is via `getServerSideProps()` that checks if the request is associated with a session, and if not, prevents navigation to the profile page. If you implement this, you can remove the corresponding check (that uses `loading` and `getSession()` inside a `useEffect()`).
--   `src/pages/profile.tsx`
--   Add the necessary imports
-
-```tsx
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
-import { GetServerSidePropsContext } from "next";
-```
-
--   Add session check in `getServerSideProps()`
-
+-   An additional way to prevent navigation to a route is by checking if the request is associated with a session, and if not, prevent navigation to the profile page. If you implement this, you can remove the corresponding check (that uses `loading` and `getSession()` inside a `useEffect()`).
+-   `src/app/profile/page.tsx`
 ```tsx
 // NOTE: This is the server-side alternative to the useEffect() to protect the /profile route in the Profile component
-export const getServerSideProps = async (context: NextPageContext) => {
-    const session = await getSession({ req: context.req });
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import ProfileForm from '@/components/profile/profile-form';
+import type { Metadata } from 'next';
 
-    if (!session) {
-        return {
-            redirect: {
-                destination: "/auth",
-                permanent: false,
-            },
-        };
-    }
-
-    return {
-        props: { session },
-    };
+export const metadata: Metadata = {
+  title: 'My profile',
+  description: 'User profile information',
 };
-```
 
-```tsx
-export const getServerSideProps = async (
-    context: GetServerSidePropsContext
-) => {
-    const session = await getServerSession(
-        context.req,
-        context.res,
-        authOptions
-    );
+export default async function ProfilePage() {
+  const session = await getServerSession(authOptions);
 
-    if (!session) {
-        return {
-            redirect: {
-                destination: "/auth",
-                permanent: false,
-            },
-        };
-    }
+  if (!session) {
+    redirect('/auth'); // server-side redirect
+  }
 
-    return {
-        props: { session },
-    };
-};
+  return <ProfileForm />;
+}
 ```
 
 ## Step 33: Adding a review
@@ -3404,65 +3530,131 @@ export const createReview = async (_id: string, review: IReview) => {
 };
 ```
 
--   `src/pages/api/products/[id]/reviews.ts` - Add API for adding a review for a product with given `id`. Note how we protect this API using `getSession()`
+-   `src/app/api/products/[id]/reviews/route.ts` - Add API for adding a review for a product with given `id`. Note how we protect this API using `getSession()`
 
 ```ts
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { IProduct } from "@/types/Product";
-import { IApiResponse, IErrorMessage } from "@/types/api";
-import { createReview } from "@/data/services/reviews";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]";
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-const handler: NextApiHandler = async (
-    req: NextApiRequest,
-    res: NextApiResponse<IApiResponse<IProduct> | IErrorMessage>
-) => {
-    const { method } = req;
+import { createReview } from '@/data/services/reviews';
+import type { IProduct } from '@/types/Product';
+import type { IApiResponse, IErrorMessage } from '@/types/api';
 
-    switch (method) {
-        case "POST": {
-            const session = await getServerSession(req, res, authOptions);
-
-            if (!session) {
-                return res.status(401).json({
-                    status: "error",
-                    message: "Not authenticated!",
-                });
-            }
-
-            try {
-                const _id = req.query.id as string;
-                const review = req.body;
-
-                review.username = session.user?.email;
-                review.date = new Date().toISOString();
-
-                const reviews = await createReview(_id, review);
-
-                return res.status(201).json({
-                    status: "success",
-                    message: reviews,
-                });
-            } catch (error) {
-                return res.status(500).json({
-                    status: "error",
-                    message: (error as Error).message,
-                });
-            }
-        }
-
-        default:
-            return res.status(405).json({
-                status: "error",
-                message: `METHOD=${method} not allowed`,
-            });
-    }
+type Params = {
+  params: { id: string };
 };
 
-export default handler;
-```
+export async function POST(req: Request, { params }: Params) {
+  const session = await getServerSession(authOptions);
 
+  if (!session) {
+    const error: IErrorMessage = {
+      status: 'error',
+      message: 'Not authenticated!',
+    };
+    return NextResponse.json(error, { status: 401 });
+  }
+
+  try {
+    const review = await req.json();
+
+    review.username = session.user?.email;
+    review.date = new Date().toISOString();
+
+    const reviews = await createReview(params.id, review);
+
+    const response: IApiResponse<IProduct> = {
+      status: 'success',
+      message: reviews,
+    };
+
+    return NextResponse.json(response, { status: 201 });
+  } catch (error) {
+    const errorResponse: IErrorMessage = {
+      status: 'error',
+      message: (error as Error).message,
+    };
+
+    return NextResponse.json(errorResponse, { status: 500 });
+  }
+}
+
+export function GET() {
+  return NextResponse.json(
+    { status: 'error', message: 'METHOD=GET not allowed' },
+    { status: 405 }
+  );
+}
+```
+- We are doing backend validation using Mongoose. In case you want to do validation using Zod this is how you can modify the POST request handler code above.
+- First define the Zod schema in ``
+```ts
+import { z } from "zod";
+
+export const ReviewSchema = z.object({
+    rating: z
+        .number({
+            required_error: "Rating is required",
+            invalid_type_error: "Rating must be a number",
+        })
+        .min(0, "Please select at least 0 star")
+        .max(5, "Rating cannot exceed 5 stars"),
+
+    text: z
+        .string({
+            required_error: "Review text is required",
+        })
+        .min(20, "Review must be at least 20 characters"),
+});
+
+export type ReviewInput = z.infer<typeof ReviewSchema>;
+```
+- Then modify `src/app/api/products/[id]/reviews/route.ts` to do the validations
+```ts
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+import { createReview } from "@/data/services/reviews";
+import { ReviewSchema } from '@/data/zod/schemas/Review';
+
+type Params = {
+    params: {
+        id: string;
+    };
+};
+
+export async function POST(req: Request, { params }: Params) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ status: 'error', message: 'Not authenticated!' }, { status: 401 });
+  }
+
+  try {
+    const rawBody = await req.json();
+    const parseResult = ReviewSchema.safeParse(rawBody);
+
+    if (!parseResult.success) {
+      const issues = parseResult.error.flatten().fieldErrors;
+      return NextResponse.json({ status: 'error', message: issues }, { status: 400 });
+    }
+
+    const review = {
+      ...parseResult.data,
+      username: session.user?.email,
+      date: new Date().toISOString(),
+    };
+
+    const reviews = await createReview(params.id, review);
+
+    return NextResponse.json({ status: 'success', message: reviews }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ status: 'error', message: (error as Error).message }, { status: 500 });
+  }
+}
+```
 -   `src/services/reviews.ts`
 
 ```ts
@@ -3494,93 +3686,85 @@ export const postReview = async (
 -   `src/components/product-details/add-review/add-review.tsx`
 
 ```tsx
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { postReview } from "@/services/reviews";
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { postReview } from '@/services/reviews';
 
 type Props = {
-    productId: string | undefined;
+  productId: string | undefined;
 };
 
 const AddReview = ({ productId }: Props) => {
-    const router = useRouter();
+  const router = useRouter();
 
-    const [rating, setRating] = useState(0);
-    const [text, setText] = useState("");
+  const [rating, setRating] = useState(0);
+  const [text, setText] = useState('');
 
-    const handleAddReview = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+  const handleAddReview = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-        try {
-            if (typeof productId === "string") {
-                await postReview(productId, { rating, text });
-                router.push(`/products/${productId}`);
-            }
-        } catch (error) {
-            alert(`Failed to add review: ${(error as Error).message}`);
-        }
-    };
+    try {
+      if (typeof productId === 'string') {
+        await postReview(productId, { rating, text });
+        router.push(`/products/${productId}`);
+      }
+    } catch (error) {
+      alert(`Failed to add review: ${(error as Error).message}`);
+    }
+  };
 
-    return (
-        <div className="bg-white p-6 rounded-md shadow max-w-xl mx-auto">
-            <h2 className="text-lg font-semibold text-gray-800">
-                Add a review
-            </h2>
-            <hr className="my-4 border-gray-300" />
+  return (
+    <div className="bg-white p-6 rounded-md shadow max-w-xl mx-auto">
+      <h2 className="text-lg font-semibold text-gray-800">Add a review</h2>
+      <hr className="my-4 border-gray-300" />
 
-            <form onSubmit={handleAddReview} className="space-y-4">
-                {/* Star Rating */}
-                <div className="flex space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                            key={star}
-                            type="button"
-                            className={`text-2xl ${
-                                star <= rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                            }`}
-                            onClick={() => setRating(star)}
-                            aria-label={`${star} star`}
-                        >
-                            ★
-                        </button>
-                    ))}
-                </div>
-
-                {/* Text Field */}
-                <div>
-                    <textarea
-                        rows={4}
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Write your review here..."
-                        required
-                    />
-                </div>
-
-                {/* Submit Button */}
-                <div>
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 transition"
-                    >
-                        Add review
-                    </button>
-                </div>
-            </form>
+      <form onSubmit={handleAddReview} className="space-y-4">
+        {/* Star Rating */}
+        <div className="flex space-x-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              className={`text-2xl ${
+                star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              }`}
+              onClick={() => setRating(star)}
+              aria-label={`${star} star`}
+            >
+              ★
+            </button>
+          ))}
         </div>
-    );
+
+        {/* Text Field */}
+        <div>
+          <textarea
+            rows={4}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Write your review here..."
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 transition"
+          >
+            Add review
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 };
 
 export default AddReview;
-```
-
--   `src/components/product-detail/product-detail.tsx` Pass on the `productId` prop to `AddReview`
-
-```tsx
-el = <AddReview productId={idRouter[0]} />;
 ```
 
 ## Step 34: Create backend services to get User's cart, update cart
