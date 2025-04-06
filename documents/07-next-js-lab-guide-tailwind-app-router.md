@@ -3829,71 +3829,72 @@ export const updateCart = async (email: string, cart: IUserCartItem) => {
 
 ## Step 35: Define API routes to work with the cart (get cart, update cart)
 
--   `src/pages/api/cart/index.ts`
+-   `src/app/api/cart/route.ts`
 
 ```tsx
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
-
+import { authOptions } from "../auth/[...nextauth]/route";
 import { getCart, updateCart } from "@/data/services/cart";
 
-const handler: NextApiHandler = async (
-    req: NextApiRequest,
-    res: NextApiResponse
-) => {
-    const { method } = req;
-
-    const session = await getServerSession(req, res, authOptions);
+export async function GET(req: NextRequest) {
+    const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
-        return res.status(401).json({ message: "Not authenticated!" });
+        return NextResponse.json(
+            { message: "Not authenticated!" },
+            { status: 401 }
+        );
     }
 
     const email = session.user.email as string;
 
-    switch (method) {
-        case "GET":
-            try {
-                const cart = await getCart(email);
-                return res.status(200).json({
-                    status: "success",
-                    message: {
-                        cart,
-                    },
-                });
-            } catch (error) {
-                return res.status(500).json({
-                    status: "error",
-                    message: (error as Error).message,
-                });
-            }
-
-        case "PUT":
-            try {
-                const updatedCart = await updateCart(email, req.body);
-                return res.status(200).json({
-                    status: "success",
-                    message: {
-                        cart: updatedCart,
-                    },
-                });
-            } catch (error) {
-                return res.status(500).json({
-                    status: "error",
-                    message: (error as Error).message,
-                });
-            }
-
-        default:
-            return res.status(405).json({
+    try {
+        const cart = await getCart(email);
+        return NextResponse.json({
+            status: "success",
+            message: { cart },
+        });
+    } catch (error) {
+        return NextResponse.json(
+            {
                 status: "error",
-                message: `METHOD=${method} not allowed`,
-            });
+                message: (error as Error).message,
+            },
+            { status: 500 }
+        );
     }
-};
+}
 
-export default handler;
+export async function PUT(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return NextResponse.json(
+            { message: "Not authenticated!" },
+            { status: 401 }
+        );
+    }
+
+    const email = session.user.email as string;
+
+    try {
+        const body = await req.json();
+        const updatedCart = await updateCart(email, body);
+        return NextResponse.json({
+            status: "success",
+            message: { cart: updatedCart },
+        });
+    } catch (error) {
+        return NextResponse.json(
+            {
+                status: "error",
+                message: (error as Error).message,
+            },
+            { status: 500 }
+        );
+    }
+}
 ```
 
 ## Step 36: Define frontend service methods to work with the cart API (get cart, update cart)
@@ -3960,31 +3961,35 @@ export const useCart = () => useContext(CartContext);
 
 ## Step 38: Set up the context provider
 
--   The `src/pages/_app.tsx` wraps the complete app's UI, and is a good place to maintain the cart state and provide to the entire application using the shopping-cart context
--   In `src/pages/_app.tsx`
+-   The `src/app/layout.tsx` wraps the complete app's UI, and is a good place to maintain the cart state and provide to the entire application using the shopping-cart context. But we have created a `Providers` component to maintain context.
+-   In `src/app/components/lib/providers/providers.tsx`
 -   Add the necessary imports
 
 ```tsx
 import { useState } from "react";
 import { CartProvider } from "@/context/shopping-cart";
 import { updateCart } from "@/services/cart";
+import { ICartItem } from '@/types/Cart';
 ```
 
 -   Define the state maintaining the shopping cart and methods to make changes to this state. Gather all the information to be shared into a value object
 
 ```tsx
-const [cart, setCart] = useState<any>([]);
+// type CartItem = {
+//     productId: string;
+//     quantity: number;
+//     product?: IProduct
+// };
+
+const [cart, setCart] = useState<ICartItem[]>([]);
 
 const changeQuantity = async (
     productId: string | undefined,
     quantityToAdd: number
 ) => {
-    if (!productId) {
-        return;
-    }
+    if (!productId) return;
 
     let newCart = [...cart];
-
     const index = newCart.findIndex((item) => item.productId === productId);
 
     if (index >= 0) {
@@ -3993,24 +3998,23 @@ const changeQuantity = async (
             quantity: newCart[index].quantity + quantityToAdd,
         };
     } else {
-        newCart.push({ productId: productId, quantity: quantityToAdd });
+        newCart.push({
+            productId,
+            quantity: quantityToAdd
+        });
     }
 
     newCart = newCart.filter((item) => item.quantity > 0);
 
-    const cartToSend = newCart.map((item) => {
-        return {
-            productId: item.product ? item.product._id : item.productId,
-            quantity: item.quantity,
-        };
-    });
+    const cartToSend = newCart.map((item) => ({
+        productId: (item.product as any)?._id ?? item.productId,
+        quantity: item.quantity,
+    }));
 
     const response = await updateCart(cartToSend);
-
     const updatedCart = response.message.cart;
 
     setCart(updatedCart);
-
     return updatedCart;
 };
 
@@ -4024,23 +4028,32 @@ const value = {
 -   Share the shopping cart value using the shopping cart context object
 
 ```tsx
-<HydrationBoundary state={pageProps.dehydratedState}>
+{/* <HydrationBoundary state={pageProps.dehydratedState}>
     <CartProvider value={value}>
         <Layout>{/* rest of UI */}</Layout>
     </CartProvider>
-</HydrationBoundary>
+</HydrationBoundary> */}
+```
+```tsx
+<SessionProvider session={session}>
+    <QueryClientProvider client={queryClient}>
+        <CartProvider value={value}>
+            {children}
+        </CartProvider>
+    </QueryClientProvider>
+</SessionProvider>
 ```
 
 ## Step 39: Populate the shopping cart from within the main navigation component, when user logs in
 
--   `src/components/main-navigation/main-navigation.tsx`
+-   `src/components/main-navigation/user-navigation/user-navigation.tsx`
 -   Add the necessary imports
 
 ```tsx
+import { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { useCart } from "@/context/shopping-cart";
 import { getCart } from "@/services/cart";
-import { useEffect } from "react";
 ```
 
 -   Update the shopping cart when user logs in
@@ -4057,7 +4070,7 @@ useEffect(() => {
         setCart(
             data.message.cart.map((item) => {
                 return {
-                    productId: item.product._id,
+                    productId: (item.product as any)._id,
                     product: item.product,
                     quantity: item.quantity,
                 };
@@ -4074,7 +4087,7 @@ useEffect(() => {
 -   Add the shopping cart icon (which shows the cart status) before the user Avatar
 
 ```tsx
-<div className="flex items-center">
+<div className="relative flex items-center">
     {/* Cart Icon */}
     {session && status === "authenticated" && (
         <div
@@ -4106,12 +4119,16 @@ useEffect(() => {
 ## Step 40: Add a cart icon on list page items, through which user can add to the cart
 
 -   `src/components/products-list/items/item.tsx`
+- Make it a client component
+```tsx
+'use client';
+```
 -   Add the necessary imports
 
 ```tsx
+import { useState } from "react";
 import { useCart } from "@/context/shopping-cart";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
 import { FaShareAlt, FaShoppingCart } from "react-icons/fa";
 ```
 
@@ -4140,7 +4157,7 @@ const loading = status === "loading";
         >
             <FaShoppingCart className="text-xl" />
         </button>
-    );
+    )
 }
 ```
 
@@ -4148,60 +4165,34 @@ const loading = status === "loading";
 
 ## Step 41: Show the ShoppingCart page
 
--   `src/pages/[cart]/index.tsx` - We render this on the server-side using `getServerSideProps()`. This is ideal as the shopping cart is a very dynamic (fast-changing) page. SSG is not a good fit for it. We also make sure during SSR that if the user is not logged in, the cart page cannot be accessed.
+-   `src/app/cart/page.tsx` - We render this on the server-side. This is ideal as the shopping cart is a very dynamic (fast-changing) page. SSG is not a good fit for it. We also make sure during SSR that if the user is not logged in, the cart page cannot be accessed.
+- __NOTE__: This page will be rendered on every request (Server-Side Rendering, i.e. SSR) because Next.js treats any async server component that depends on request-specific data (like getServerSession) as dynamically rendered by default.
 
 ```tsx
-import Head from "next/head";
-import { GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 import Cart from "@/components/cart/cart";
-import { ICartItem } from "@/types/Cart";
 import { getCart } from "@/data/services/cart";
 
-type Props = {
-    cart: ICartItem[];
+export const metadata = {
+  title: "Shopping cart | Mantra Store",
+  description: "Shopping cart",
 };
 
-export default function CartPage({ cart }: Props) {
-    return (
-        <>
-            <Head>
-                <title>Shopping cart | Mantra Store</title>
-                <meta name="description" content="Shopping cart" />
-            </Head>
+export default async function CartPage() {
+  const session = await getServerSession(authOptions);
 
-            <Cart cart={cart} />
-        </>
-    );
+  if (!session?.user?.email) {
+    redirect("/auth"); // App Router's redirect (works like useRouter.push on server)
+  }
+
+  const email = session.user.email;
+  const cart = await getCart(email);
+
+  return <Cart cart={cart} />;
 }
-
-export const getServerSideProps = async (
-    context: GetServerSidePropsContext
-) => {
-    const session = await getServerSession(
-        context.req,
-        context.res,
-        authOptions
-    );
-
-    if (!session || !session.user || !session.user.email) {
-        return {
-            redirect: {
-                destination: "/auth",
-                permanent: false,
-            },
-        };
-    }
-
-    const email = session.user.email;
-    const cart = await getCart(email);
-
-    return {
-        props: { cart },
-    };
-};
 ```
 
 -   `src/components/cart/cart.tsx` - We create the `Cart` component that is used in the CartPage.
@@ -4324,4 +4315,146 @@ function Cart({ cart }: Props) {
 }
 
 export default Cart;
+```
+
+## Step 42: Exercise: Convert the Cart component into a server component by passing cart data from the CartPage component
+- Solution
+```tsx
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/options";
+import { redirect } from "next/navigation";
+
+import { getCart } from "@/data/services/cart";
+import Cart from "@/components/cart/Cart";
+
+export const metadata = {
+  title: "Shopping cart | Mantra Store",
+  description: "Shopping cart",
+};
+
+export default async function CartPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    redirect("/auth");
+  }
+
+  const email = session.user.email;
+  const cart = await getCart(email);
+
+  return <Cart cart={cart} />;
+}
+```
+```tsx
+'use client';
+
+import { useCart } from "@/context/shopping-cart";
+import { ICartItem } from "@/types/Cart";
+import { IProduct } from "@/types/Product";
+import Image from "next/image";
+import { FaPlus, FaMinus } from "react-icons/fa";
+
+type Props = {
+    cart: ICartItem[];
+};
+
+export default function Cart({ cart }: Props) {
+    const { changeQuantity } = useCart();
+
+    if (!cart || cart.length === 0) {
+        return (
+            <div className="flex justify-center items-center px-4 py-8 text-gray-600">
+                Cart is empty
+            </div>
+        );
+    }
+
+    const total = cart.reduce((acc, item) => {
+        const product = item.product as IProduct;
+        return acc + product.price * item.quantity;
+    }, 0);
+
+    return (
+        <section className="max-w-6xl mx-auto px-4 py-6">
+            <h1 className="text-2xl font-semibold mb-4">Shopping cart</h1>
+            <hr className="mb-6 border-gray-300" />
+
+            <div className="overflow-x-auto rounded shadow border border-gray-200">
+                <table className="min-w-full bg-white">
+                    <thead className="bg-gray-100 border-b">
+                        <tr className="text-sm font-medium text-gray-700 text-left">
+                            <th className="py-3 px-4 text-center">S. No.</th>
+                            <th className="py-3 px-4">Image</th>
+                            <th className="py-3 px-4">Name</th>
+                            <th className="py-3 px-4 text-center">Quantity</th>
+                            <th className="py-3 px-4 text-right">Price ($)</th>
+                            <th className="py-3 px-4 text-right">Total Price ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {cart.map(({ product, quantity }, idx) => {
+                            const prod = product as IProduct;
+
+                            return (
+                                <tr
+                                    key={prod._id}
+                                    className="border-b hover:bg-gray-50 text-sm"
+                                >
+                                    <td className="py-3 px-4 text-center">{idx + 1}</td>
+                                    <td className="py-3 px-4">
+                                        <Image
+                                            src={prod.image}
+                                            alt={prod.title}
+                                            width={48}
+                                            height={48}
+                                        />
+                                    </td>
+                                    <td className="py-3 px-4">{prod.title}</td>
+                                    <td className="py-3 px-4 text-center">
+                                        <button
+                                            aria-label="decrease quantity"
+                                            className="text-green-600 hover:text-green-800 mr-2"
+                                            onClick={async () => {
+                                                await changeQuantity(prod._id, -1);
+                                                window.location.reload();
+                                            }}
+                                        >
+                                            <FaMinus />
+                                        </button>
+                                        {quantity}
+                                        <button
+                                            aria-label="increase quantity"
+                                            className="text-green-600 hover:text-green-800 ml-2"
+                                            onClick={async () => {
+                                                await changeQuantity(prod._id, 1);
+                                                window.location.reload();
+                                            }}
+                                        >
+                                            <FaPlus />
+                                        </button>
+                                    </td>
+                                    <td className="py-3 px-4 text-right">
+                                        {prod.price.toFixed(2)}
+                                    </td>
+                                    <td className="py-3 px-4 text-right">
+                                        {(quantity * prod.price).toFixed(2)}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                    <tfoot>
+                        <tr className="bg-gray-50 text-sm font-medium text-gray-700 border-t">
+                            <td colSpan={4} />
+                            <td className="py-3 px-4 text-right">Total</td>
+                            <td className="py-3 px-4 text-right">
+                                {total.toFixed(2)}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+    );
+}
 ```
