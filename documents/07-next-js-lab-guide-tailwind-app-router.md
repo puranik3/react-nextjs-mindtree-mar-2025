@@ -2313,7 +2313,7 @@ export default ProductReviews;
 -   `src/components/product-detail/product-reviews/product-reviews.tsx` - Add a button with a click handler that when invoked uses the router's `push()` method for navigation
 
 ```tsx
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 ```
 
 ```tsx
@@ -2325,7 +2325,7 @@ const router = useRouter();
 
 ```tsx
 const navigateToAddReview = () => {
-    router.push(`/products/${productId}/add`);
+    router.push(`/products/${productId}/addreview`);
 };
 ```
 
