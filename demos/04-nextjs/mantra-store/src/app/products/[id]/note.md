@@ -1,1 +1,1 @@
-Add an "add" folder with `page.tsx` - Render the AddReview component
+Add an "addreview" folder with `page.tsx` - Render the AddReview component
