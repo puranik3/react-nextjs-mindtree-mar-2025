@@ -9,7 +9,7 @@ type Props = {
 
 // in case of ISR (revalidate is exported), it runs periodically
 // in case product is not one of them generated at build-time, this function runs at request time! In case such a product exists, the page is shown, else not found page is shown
-export default async function Page({ params }: Props) {
+export default async function ProductReviewsPage({ params }: Props) {
     const { id } = await params;
 
     const product: IProduct = await getProductById(id);

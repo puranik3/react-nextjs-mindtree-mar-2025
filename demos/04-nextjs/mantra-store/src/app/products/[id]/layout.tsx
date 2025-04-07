@@ -7,6 +7,12 @@ import type { IProduct } from "@/types/Product";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import {
+    ProductProvider,
+} from "@/context/product-context";
+import type {
+    ProductContextValue,
+} from "@/context/product-context";
 
 type Props = {
     params: { id: string };
@@ -42,10 +48,16 @@ export default async function Layout({ children, params } : Props ) {
         return notFound();
     }
 
+    const value = {
+        // product: product,
+        product,
+        productId: id,
+    };
+
     return (
-        <>
+        <ProductProvider value={value}>
             <ProductDetail product={product} productId={id} />
             {children}
-        </>
+        </ProductProvider>
     )
 }
