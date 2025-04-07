@@ -44,3 +44,8 @@ export const getProductById = async (_id: string) => {
         reviews: serializedProductReviews,
     };
 };
+
+export const getProductIds = async () => {
+    const products = await Product.find().select("_id");
+    return products.map((p) => p._id.toString());
+};
