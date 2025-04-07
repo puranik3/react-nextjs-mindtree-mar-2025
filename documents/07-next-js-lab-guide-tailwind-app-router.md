@@ -4317,7 +4317,7 @@ function Cart({ cart }: Props) {
 export default Cart;
 ```
 
-## Step 42: Exercise: Convert the Cart component into a server component by passing cart data from the CartPage component
+## Step 42: Exercise: Pass cart data from the server side to the CartPage component
 - Solution
 ```tsx
 import { getServerSession } from "next-auth";

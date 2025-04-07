@@ -46,8 +46,8 @@ const ProductsList = ({ products, count, page }: Props) => {
     useEffect(
         () => {
             if ((!initialRender.current || actualPage !== page) && data?.message) {
-                setActualProducts(data.message.products);
-                setActualCount(data.message.count);
+                setActualProducts(data.message?.products);
+                setActualCount(data.message?.count);
             }
 
             // console.log('data = ', data);
