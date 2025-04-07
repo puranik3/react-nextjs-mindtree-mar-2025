@@ -11,6 +11,7 @@ export type ProductContextValue = {
 
 export const ProductContext = createContext<ProductContextValue | null>(null);
 
+// used by consumers of the data - in our case the product reviews, add review components
 export const useProduct = () => {
     const context = useContext(ProductContext);
     if (!context) {
@@ -21,6 +22,7 @@ export const useProduct = () => {
     return context;
 };
 
+// used by the component that provides the shared context data - in our case the product detail layout page
 export function ProductProvider({
     children,
     value,
