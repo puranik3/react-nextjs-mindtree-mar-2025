@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title></title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <!-- -->
+        <div id="root">
+            <button id="btn-decrement" onclick="store.dispatch(decrement())">
+                -
+            </button>
+            <span id="value">0</span>
+            <button id="btn-increment" onclick="store.dispatch(increment())">
+                +
+            </button>
+        </div>
+
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script> -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.js"></script>
+
+        <script>
+            // action types
+            const DECREMENT = "DECREMENT";
+            const INCREMENT = "INCREMENT";
+
+            // action creators
+            function decrement() {
+                return {
+                    type: DECREMENT,
+                };
+            }
+
+            function increment() {
+                return {
+                    type: INCREMENT,
+                };
+            }
+
+            const initialState = {
+                value: 0,
+            };
+
+            // The reducer function returns the new state
+            // It should be a "pure" function (predictable, and does not mutate arguments, does not use global variables)
+            const counterReducer = (curState = initialState, action) => {
+                switch (action.type) {
+                    case DECREMENT:
+                        // we MUST return a new object
+                        return {
+                            ...curState,
+                            value: curState.value - 1,
+                        };
+                    case INCREMENT:
+                        // we MUST return a new object
+                        return {
+                            ...curState,
+                            value: curState.value + 1,
+                        };
+                    default:
+                        return curState;
+                }
+            };
+
+            const store = Redux.createStore(counterReducer);
+
+            function render() {
+                document.getElementById("value").innerText =
+                    store.getState().value;
+            }
+
+            // Hey store! Whenever the state changes, call the render method
+            store.subscribe(render);
+        </script>
+    </body>
+</html>
