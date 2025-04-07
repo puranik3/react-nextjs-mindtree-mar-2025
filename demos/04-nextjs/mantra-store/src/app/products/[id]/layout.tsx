@@ -6,6 +6,7 @@ import ProductDetail from "@/components/product-detail/product-detail";
 import type { IProduct } from "@/types/Product";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
 
 type Props = {
     params: { id: string };
@@ -36,6 +37,10 @@ export async function generateMetadata({
 export default async function Layout({ children, params } : Props ) {
     const { id } = await params;
     const product: IProduct = await getProductById(id);
+
+    if(!product) {
+        return notFound();
+    }
 
     return (
         <>
