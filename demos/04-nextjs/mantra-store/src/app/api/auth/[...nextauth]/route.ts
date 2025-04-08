@@ -12,10 +12,14 @@ export const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
+
+            // what is passed to login route
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
             },
+
+            // how login should work
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("Missing email or password");
@@ -48,12 +52,14 @@ export const authOptions: AuthOptions = {
         }),
     ],
 
+    // strategy used for auth - local JWT-based auth
     session: {
         strategy: "jwt",
         maxAge: 60 * 60 * 24 * 30,
     },
 
     callbacks: {
+        // what to include in JWT "claims"
         async jwt({
             token,
             user,
@@ -71,6 +77,7 @@ export const authOptions: AuthOptions = {
             return token;
         },
 
+        // logged in user's info (session info) to whichever part of the app request for it
         async session({ session, token }: { session: Session; token: JWT }) {
             if (session.user) {
                 session.user.id = token.id as string;

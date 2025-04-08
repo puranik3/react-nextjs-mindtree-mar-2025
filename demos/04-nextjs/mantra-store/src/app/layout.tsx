@@ -3,6 +3,7 @@ import MainNavigation from "@/components/main-navigation/main-navigation";
 import { ReactNode } from "react";
 import Providers from "@/components/lib/providers/providers";
 import { getServerSession } from 'next-auth';
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 // DON'T DO THIS - FIND ALTERNATIVE - OK FOR development
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -20,7 +21,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const session = await getServerSession(/*authOptions*/);
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">
