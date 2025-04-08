@@ -10,7 +10,6 @@ function AuthForm() {
     const [isLogin, setIsLogin] = useState(true);
     // prevent navigation to this page if session exists
 
-
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,8 +25,6 @@ function AuthForm() {
     useEffect(() => {
         getSession().then((session) => {
             if (session) {
-                // bad but a temporray fix for router.push() giving problems
-                // window.location.href = "/profile";
                 router.push('/profile');
             } else {
                 setIsLoading(false);

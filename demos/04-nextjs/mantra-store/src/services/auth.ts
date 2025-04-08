@@ -1,4 +1,4 @@
-import { ICredentials, IRegister } from "@/types/User";
+import { ICredentials, IRegister, IChangePassword } from "@/types/User";
 import axios from "axios";
 
 type IRegisterResponse = {
@@ -21,3 +21,21 @@ export const register = async (credentials: IRegister) => {
     );
     return response.data;
 };
+
+type IChangePasswordResponse = {
+    message: string;
+};
+
+export async function changePassword(passwordData: IChangePassword) {
+    const response = await axios.patch<IChangePasswordResponse>(
+        "/api/auth/change-password",
+        passwordData,
+        {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    return response.data;
+}
