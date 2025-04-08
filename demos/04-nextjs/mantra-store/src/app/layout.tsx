@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import MainNavigation from "@/components/main-navigation/main-navigation";
 import { ReactNode } from "react";
 import Providers from "@/components/lib/providers/providers";
+import { getServerSession } from 'next-auth';
 
 // DON'T DO THIS - FIND ALTERNATIVE - OK FOR development
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -14,11 +15,13 @@ export const metadata: Metadata = {
   description: "Mantra Store - shop from our wide variety of products. Have them delivered within 2 hours at your doorstep.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const session = await getServerSession(/*authOptions*/);
+
   return (
     <html lang="en">
       <head>
@@ -31,7 +34,7 @@ export default function RootLayout({
       <body
         className="antialiased"
       >
-        <Providers>
+        <Providers session={session}>
           <MainNavigation />
           <div className="max-w-screen-xl mx-auto mt-12 px-4">
             {children}
