@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 // define Mongoose models by importing them
 import "./models/Product";
-// ...import any models you create in future here
+import "./models/User";
 
 export const connect = async () => {
     const connectionStr =
