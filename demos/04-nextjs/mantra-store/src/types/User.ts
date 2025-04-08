@@ -10,3 +10,7 @@ export interface IUser {
     role?: "customer" | "admin";
     cart?: IUserCartItem[];
 }
+
+export type IRegister = Pick<IUser, "email" | "username" | "password">;
+
+export type ICredentials = Pick<IUser, "email" | "password">;

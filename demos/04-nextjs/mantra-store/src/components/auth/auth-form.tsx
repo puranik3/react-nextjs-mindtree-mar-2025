@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { register } from "@/services/auth";
 
 function AuthForm() {
     const [isLogin, setIsLogin] = useState(true);
@@ -13,13 +14,32 @@ function AuthForm() {
         setIsLogin((prevState) => !prevState);
     }
 
+    async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault(); // prevents browser default action
+
+        try {
+            // registration
+            if (!isLogin) {
+                await register({ email, username, password });
+                alert(username + " registered successfully");
+                setIsLogin(true);
+                return;
+            }
+        } catch (error) {
+            alert((error as Error).message);
+        }
+    }
+
     return (
         <section className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">
             <h1 className="text-2xl font-semibold mb-6 text-center">
                 {isLogin ? "Login" : "Sign Up"}
             </h1>
 
-            <form className="space-y-4">
+            <form
+                className="space-y-4"
+                onSubmit={submitHandler}
+            >
                 {!isLogin && (
                     <div>
                         <label

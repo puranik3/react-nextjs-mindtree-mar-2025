@@ -7,17 +7,17 @@ import type { IApiResponse, IErrorMessage } from "@/types/api";
 
 export async function POST(req: NextRequest) {
     try {
-        const user: IUser = await req.json();
-        const registeredUser = await register(user);
+        const user: IUser = await req.json(); // read data from request body
+        const registeredUser = await register(user); // add user to db
 
-        const response: IApiResponse<IUser> = {
+        const response: IApiResponse<IUser> = { // generate success response and send it
             status: "success",
             message: registeredUser,
         };
 
         return NextResponse.json(response, { status: 201 });
     } catch (error) {
-        const errRes: IErrorMessage = {
+        const errRes: IErrorMessage = { // if error occured, generate error response and send it
             status: "error",
             message: (error as Error).message,
         };
