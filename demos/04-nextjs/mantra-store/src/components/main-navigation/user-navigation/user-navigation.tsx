@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const authenticatedUserMenu = [
@@ -15,17 +15,40 @@ const unauthenticatedUserMenu = [
 
 export default function UserNavigation() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    // const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(
+    //     null
+    // )
 
     const { data: session, status } = useSession();
     const router = useRouter();
 
     const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
 
-    const handleUserMenuClick = (href: string) => {
+    // const handleUserMenuClick = (href: string) => {
+    //     setUserMenuOpen(false);
+    //     router.push(href);
+    // };
+
+    const handleCloseUserMenu = async (event: React.MouseEvent, href?: string) => {
+        event.preventDefault();
+
         setUserMenuOpen(false);
-        router.push(href);
+        // setAnchorElUser(null);
+
+        console.log("href=", href);
+
+        if (!href) return;
+
+        if (href === "/logout") {
+            await signOut({
+                callbackUrl: "/auth",
+            });
+            // window.location.href = "/auth
+        } else {
+            router.push(href);
+        }
     };
-    
+
     return (
         <div className="relative">
             <button
@@ -44,9 +67,10 @@ export default function UserNavigation() {
                     ).map((item) => (
                         <button
                             key={item.text}
-                            onClick={() =>
-                                handleUserMenuClick(item.href)
-                            }
+                            onClick={(event) => {
+                                handleCloseUserMenu(event, item.href);
+                                // handleUserMenuClick(item.href);
+                            }}
                             className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                         >
                             {item.text}
