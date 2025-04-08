@@ -2709,7 +2709,7 @@ import "./models/User";
 
 ## Step 26: Create the register API route
 
--   `src/pages/api/auth/register.ts` - Set up the API to register a new user
+-   `src/app/api/auth/register.ts` - Set up the API to register a new user
 
 ```tsx
 import { NextResponse } from 'next/server';
