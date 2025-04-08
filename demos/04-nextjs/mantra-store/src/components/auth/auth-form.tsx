@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { signIn, getSession } from "next-auth/react";
 import { register } from "@/services/auth";
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
 function AuthForm() {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
+    // prevent navigation to this page if session exists
+
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -16,6 +18,23 @@ function AuthForm() {
     function switchAuthModeHandler() {
         setIsLogin((prevState) => !prevState);
     }
+
+    // Consider refactoring to a custom hook that prevents navigation to a page on logged in / not logged in
+    // ---
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        getSession().then((session) => {
+            if (session) {
+                // bad but a temporray fix for router.push() giving problems
+                // window.location.href = "/profile";
+                router.push('/profile');
+            } else {
+                setIsLoading(false);
+            }
+        });
+    }, []);
+    // ---
 
     async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault(); // prevents browser default action
@@ -47,6 +66,14 @@ function AuthForm() {
         } catch (error) {
             alert((error as Error).message);
         }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen px-4">
+                Wait a second...
+            </div>
+        );
     }
 
     return (
