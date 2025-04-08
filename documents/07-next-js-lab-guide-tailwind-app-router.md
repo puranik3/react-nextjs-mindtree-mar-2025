@@ -4093,6 +4093,8 @@ const AddReview = () => {
 
 export default AddReview;
 ```
+- __NOTE__: Using React built-in `useTransition()` is fine for tracking server action progress. However, when working with form submissions and server actions, Next.js provides dedicated hooks that are even better suited: `useFormState()` and `useFormStatus()`. Alternatively you can use `useActionState()` from React. Explore them.
+
 
 ## Step 34: Create backend services to get User's cart, update cart
 
@@ -4785,3 +4787,194 @@ export default function Cart({ cart }: Props) {
     );
 }
 ```
+
+## Step 43: Understanding middleware
+- Middleware runs before page/component is rendered. It is apt for things like authentication, redirects, localization, and logging. It is executed before the request reaches your route handlers or page components, giving you control over the flow.
+- In `src/middleware.tsx`
+```ts
+// middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+
+// Add a matcher to control where the middleware will run (it runs for these matching routes only)
+// export const config = {
+//     matcher: ["/cart/:path*", "/auth/:path*", "/profile/:path*"],
+// };
+
+export async function middleware(request: NextRequest) {
+    // getToken() extracts the JWT from cookies (managed by next-auth)
+    // It lets you know if a user is logged in and optionally gives you role info
+    const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    const isCartPage = request.nextUrl.pathname.startsWith("/cart");
+    const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
+
+    console.log("\n---");
+    console.log("Middleware running. Path is", request.nextUrl.pathname);
+    console.log("Token is", token);
+    console.log("isCartPage", isCartPage);
+    console.log("isAuthPage", isAuthPage);
+    console.log("Request URL", request.url);
+    console.log("---\n");
+
+    // If user is not logged in and trying to access protected route
+    if (!token && isCartPage) {
+        return NextResponse.redirect(new URL("/auth", request.url));
+    }
+
+    // If user is logged in and tries to access login page
+    if (token && isAuthPage) {
+        return NextResponse.redirect(new URL("/products", request.url));
+    }
+
+    return NextResponse.next();
+}
+```
+- Now you can remove the redirection logic from `src/components/auth/auth-form.tsx`
+```tsx
+// prevent navigation to this page if session exists
+// const [isLoading, setIsLoading] = useState(true);
+
+// useEffect(() => {
+//     getSession().then((session) => {
+//         if (session) {
+//             // bad but a temporray fix for router.push() giving problems
+//             // window.location.href = "/profile";
+//             router.push('/products');
+//         } else {
+//             setIsLoading(false);
+//         }
+//     });
+// }, []);
+
+// if (isLoading) {
+//     return (
+//         <div className="flex justify-center items-center min-h-screen px-4">
+//             Loading...
+//         </div>
+//     );
+// }
+```
+- And similarly from `src/components/profile/profile-form.tsx`
+```tsx
+// const [isLoading, setIsLoading] = useState(true);
+
+// useEffect(() => {
+//     getSession().then((session) => {
+//       if (!session) {
+//         router.push('/auth');
+//       } else {
+//         setIsLoading(false);
+//       }
+//     });
+//   }, [router]);
+
+// if (isLoading) {
+//     return (
+//       <div className="flex justify-center items-center min-h-screen px-4">
+//         Loading...
+//       </div>
+//     );
+//   }
+```
+- So which way of protection should we use - client-based or server-based (middleware-based)?
+    - Use middleware to block access before rendering
+    - Use `useSession()` or `getServerSession()` in components to access session data and conditionally render UI (eg. some UI for authenticated user and some other UI for unauthenticated users).
+
+## Step 44: Using fetch() API for SSG, SSR, ISR
+- We have made queries to the DB and seen how to achieve SSG, SSR, ISR. If we instead had an API to query (external API), we achieve these using the options passed to the `fetch()` API (which Next JS had modified for the Node JS backend). Let us reimplement some pages to use `fetch()`. Our API is available as a separate backend at this location - `https://mantra-server-nzl2.onrender.com/api`
+- In the `.env` file add this
+```
+NEXT_API_SITE_URL=https://mantra-server-nzl2.onrender.com/api
+```
+- Make sure to restart the dev server (changes in `.env` files may not get picked up otherwise)
+- We demonstrate use of `fetch` using `app/products/[id]/page.tsx`. Note that we have removed the `revalidate` constant from the top of the page. Setting `{next : { revalidate: 60 } }` as the `fetch` options achieves ISR.
+```tsx
+import { ProductProvider } from "@/context/product-context";
+import ProductDetail from "@/components/product-detail/product-detail";
+import type { IProduct } from "@/types/Product";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+type Props = {
+    params: { id: string };
+    children: ReactNode;
+};
+
+// Replace with actual external API URL base
+const API_BASE_URL = `${process.env.NEXT_API_SITE_URL}/products`;
+
+async function fetchProductById(id: string): Promise<IProduct> {
+    console.log("Fetching product from API");
+
+    const res = await fetch(`${API_BASE_URL}/${id}`, {
+        next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch product");
+    }
+
+    const data = await res.json();
+    return data;
+}
+
+async function fetchProductIds(): Promise<string[]> {
+    console.log("Fetching product IDs from API");
+
+    const res = await fetch(`${API_BASE_URL}`, {
+        next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch product IDs");
+    }
+
+    const data = await res.json();
+    return data.products.map((product: IProduct) => product._id);
+}
+
+export async function generateStaticParams() {
+    const ids = await fetchProductIds();
+    return ids.map((id) => ({ id }));
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+    const { id } = await params;
+    const product = await fetchProductById(id);
+    return {
+        title: product?.title ?? "Product details",
+        description: product?.description ?? "",
+    };
+}
+
+export default async function ProductLayout({ params, children }: Props) {
+    const { id } = await params;
+    const product: IProduct = await fetchProductById(id);
+
+    const value = {
+        product,
+        productId: id,
+    };
+
+    return (
+        <ProductProvider value={value}>
+            <ProductDetail product={product} productId={id} />
+            <div className="mt-6">{children}</div>
+        </ProductProvider>
+    );
+}
+```
+- Since we are using ISR, changes to a product in the database, will reflect on the product detail page only after 60 seconds.
+- __NOTE__: The external backend does not have a dedicated API for fetching only product IDs. Hence we use the product list API itself (which gives only 10 products though - the rest of products will fall back to SSR as their pages will not be rendered using SSG/ISR).
+- __EXERCISES__:
+    - Try SSR and SSG using appropriate fetch options
+    - Use `fetch()` to external API, instead of calling service methods to access the database in other pages as well.

@@ -14,16 +14,30 @@ yarn add zustand
 
 ### Step 2: Creating a Store
 
-Create a new file `store.js`:
+Create a new file `src/store.js`:
 
-```javascript
-import { create } from 'zustand';
+```ts
+import { create } from "zustand";
 
-const useStore = create((set) => ({
-  count: 0,
-  increment: () => set((state) => ({ count: state.count + 1 })),
-  decrement: () => set((state) => ({ count: state.count - 1 })),
-  reset: () => set({ count: 0 }),
+type Theme = "light" | "dark";
+
+interface StoreState {
+    count: number;
+    increment: () => void;
+    decrement: () => void;
+    reset: () => void;
+    theme: Theme;
+    toggleTheme: () => void;
+}
+
+const useStore = create<StoreState>((set) => ({
+    count: 0,
+    increment: () => set((state) => ({ count: state.count + 1 })),
+    decrement: () => set((state) => ({ count: state.count - 1 })),
+    reset: () => set({ count: 0 }),
+    theme: "light",
+    toggleTheme: () =>
+        set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
 }));
 
 export default useStore;
@@ -33,7 +47,7 @@ export default useStore;
 
 Create a component, `Counter.jsx`:
 
-```jsx
+```tsx
 import React from 'react';
 import useStore from './store';
 
@@ -51,6 +65,13 @@ const Counter = () => {
 };
 
 export default Counter;
+```
+- In `src/components/common/Menu/Menu.tsx`
+```tsx
+import useStore from '../../../store';
+```
+```tsx
+const { theme, toggleTheme } = useStore();
 ```
 
 ### Step 4: Integrate Component into App
@@ -77,9 +98,13 @@ export default App;
 
 Zustand allows selecting parts of the state efficiently:
 
-```jsx
+```tsx
 const count = useStore((state) => state.count);
 const increment = useStore((state) => state.increment);
+```
+```tsx
+const theme = useStore( state => state.theme );
+const toggleTheme = useStore( state => state.toggleTheme );
 ```
 
 This helps optimize re-rendering of components.
