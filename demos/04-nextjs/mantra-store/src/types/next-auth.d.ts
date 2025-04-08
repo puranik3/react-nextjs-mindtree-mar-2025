@@ -1,6 +1,7 @@
 // .d.ts -> TS Type declaration file
 import NextAuth from "next-auth";
 
+// We modify next-auth built-in interfaces using "Declaration merging" features of TypeScript interfaces
 declare module "next-auth" {
     interface Session {
         user: {
@@ -18,6 +19,9 @@ declare module "next-auth" {
     }
 }
 
+// Algo.Claims.Signature
+// Claims -> iss, exp (by default)
+// Claims -> iss, exp, id, username, role (by default)
 declare module "next-auth/jwt" {
     interface JWT {
         id: string;

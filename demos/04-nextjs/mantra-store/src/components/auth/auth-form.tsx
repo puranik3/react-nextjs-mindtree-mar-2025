@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { register } from "@/services/auth";
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 function AuthForm() {
+    const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
 
     const [username, setUsername] = useState("");
@@ -24,6 +27,22 @@ function AuthForm() {
                 alert(username + " registered successfully");
                 setIsLogin(true);
                 return;
+            }
+
+            // login
+            if (isLogin) {
+                // login
+                const result = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                })
+
+                if (result?.ok && !result.error) {
+                    router.push("/products")
+                } else {
+                    alert("Login failed")
+                }
             }
         } catch (error) {
             alert((error as Error).message);
