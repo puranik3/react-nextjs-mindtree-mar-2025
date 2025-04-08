@@ -3940,6 +3940,159 @@ const AddReview = () => {
 
 export default AddReview;
 ```
+- To show the errors in the frontend first modify the server action to throw a real object with errors (rather than stringified errors). In `src/actions/reviews.ts`
+```tsx
+'use server';
+
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { createReview } from '@/data/services/reviews';
+import { ReviewSchema } from '@/data/zod/schemas/Review';
+
+export async function addReviewAction(
+  productId: string,
+  data: { rating: number; text: string }
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    throw {
+      type: 'auth',
+      message: 'Not authenticated!',
+    };
+  }
+
+  const result = ReviewSchema.safeParse(data);
+
+  if (!result.success) {
+    throw {
+      type: 'validation',
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const review = {
+    ...result.data,
+    username: session.user?.email,
+    date: new Date().toISOString(),
+  };
+
+  const updatedReviews = await createReview(productId, review);
+  return updatedReviews;
+}
+```
+- Then in `src/components/product-detail/add-review/add-review.tsx`
+```tsx
+'use client';
+
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { useProduct } from '@/context/product-context';
+import { addReviewAction } from '@/actions/reviews';
+
+const AddReview = () => {
+  const { productId, updateReviews } = useProduct();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const [rating, setRating] = useState(0);
+  const [text, setText] = useState('');
+
+  const [formErrors, setFormErrors] = useState<{
+    rating?: string[];
+    text?: string[];
+    general?: string;
+  }>({});
+
+  const handleAddReview = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormErrors({}); // Clear errors on new submit
+
+    if (typeof productId !== 'string') return;
+
+    startTransition(async () => {
+      try {
+        const updatedReviews = await addReviewAction(productId, { rating, text });
+        updateReviews(updatedReviews);
+        router.push(`/products/${productId}`);
+      } catch (error: any) {
+        if (error?.type === 'validation') {
+          setFormErrors(error.errors);
+        } else if (error?.type === 'auth') {
+          setFormErrors({ general: error.message });
+        } else {
+          setFormErrors({ general: 'An unexpected error occurred.' });
+        }
+      }
+    });
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-md shadow max-w-xl mx-auto">
+      <h2 className="text-lg font-semibold text-gray-800">Add a review</h2>
+      <hr className="my-4 border-gray-300" />
+
+      {formErrors.general && (
+        <p className="text-red-600 mb-4">{formErrors.general}</p>
+      )}
+
+      <form onSubmit={handleAddReview} className="space-y-4">
+        {/* Star Rating */}
+        <div>
+          <div className="flex space-x-1 mb-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                className={`text-2xl ${
+                  star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                }`}
+                onClick={() => setRating(star)}
+                aria-label={`${star} star`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          {formErrors.rating && (
+            <p className="text-sm text-red-600">{formErrors.rating[0]}</p>
+          )}
+        </div>
+
+        {/* Text Field */}
+        <div>
+          <textarea
+            rows={4}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Write your review here..."
+            required
+          />
+          {formErrors.text && (
+            <p className="text-sm text-red-600 mt-1">{formErrors.text[0]}</p>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <div>
+          <button
+            type="submit"
+            className={`bg-blue-600 text-white font-medium py-2 px-4 rounded transition ${
+              isPending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+            }`}
+            disabled={isPending}
+          >
+            {isPending ? 'Submitting...' : 'Add review'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddReview;
+```
 
 ## Step 34: Create backend services to get User's cart, update cart
 
