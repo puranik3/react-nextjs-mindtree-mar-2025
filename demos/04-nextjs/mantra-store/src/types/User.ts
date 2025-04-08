@@ -14,3 +14,8 @@ export interface IUser {
 export type IRegister = Pick<IUser, "email" | "username" | "password">;
 
 export type ICredentials = Pick<IUser, "email" | "password">;
+
+export interface IChangePassword {
+    oldPassword: string;
+    newPassword: string;
+}
