@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json", // Extend the main tsconfig.json
+    "compilerOptions": {
+        "jsx": "react-jsx", // Use the correct JSX setting for tests
+        "types": ["jest", "@testing-library/jest-dom"], // Include Jest types
+        "moduleResolution": "node" // Ensure Node module resolution
+    },
+    "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__/**/*"]
+}
+// 

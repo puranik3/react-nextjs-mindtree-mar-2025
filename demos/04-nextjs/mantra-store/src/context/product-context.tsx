@@ -1,12 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
-import { createContext, useContext } from "react";
-import { IProduct } from "@/types/Product";
+import { ReactNode, useState } from 'react';
+import { createContext, useContext } from 'react';
+import { IProduct, IReview } from '@/types/Product';
 
 export type ProductContextValue = {
-    product: IProduct | null;
+    product: IProduct;
     productId: string;
+    updateReviews: (reviews: IReview[]) => void;
 };
 
 export const ProductContext = createContext<ProductContextValue | null>(null);
@@ -28,10 +29,25 @@ export function ProductProvider({
     value,
 }: {
     children: ReactNode;
-    value: ProductContextValue;
+    value: Omit<ProductContextValue, 'updateReviews'>;
 }) {
+    const [reviews, setReviews] = useState<IReview[]>(value.product.reviews);
+
+    const updateReviews = (newReviews: IReview[]) => {
+        setReviews(newReviews);
+    };
+
+    const valueWithUpdatedReviews = {
+        ...value,
+        product: {
+            ...value.product,
+            reviews: reviews,
+        },
+        updateReviews,
+    };
+
     return (
-        <ProductContext.Provider value={value}>
+        <ProductContext.Provider value={valueWithUpdatedReviews}>
             {children}
         </ProductContext.Provider>
     );

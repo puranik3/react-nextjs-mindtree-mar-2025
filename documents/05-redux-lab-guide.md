@@ -172,6 +172,7 @@ const themeSlice = createSlice({
     name: "theme",
     initialState,
     reducers: {
+        // ACTTION type = "theme/toggleTheme", action creator are created
         toggleTheme(curState) {
             curState.value = curState.value === "light" ? "dark" : "light";
         },

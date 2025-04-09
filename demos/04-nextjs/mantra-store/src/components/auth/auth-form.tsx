@@ -20,17 +20,17 @@ function AuthForm() {
 
     // Consider refactoring to a custom hook that prevents navigation to a page on logged in / not logged in
     // ---
-    const [isLoading, setIsLoading] = useState(true);
+    // const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        getSession().then((session) => {
-            if (session) {
-                router.push('/profile');
-            } else {
-                setIsLoading(false);
-            }
-        });
-    }, []);
+    // useEffect(() => {
+    //     getSession().then((session) => {
+    //         if (session) {
+    //             router.push('/profile');
+    //         } else {
+    //             setIsLoading(false);
+    //         }
+    //     });
+    // }, []);
     // ---
 
     async function submitHandler(event: React.FormEvent<HTMLFormElement>) {
@@ -65,13 +65,13 @@ function AuthForm() {
         }
     }
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen px-4">
-                Wait a second...
-            </div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex justify-center items-center min-h-screen px-4">
+    //             Wait a second...
+    //         </div>
+    //     );
+    // }
 
     return (
         <section className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">

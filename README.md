@@ -12,3 +12,8 @@ https://mantra-server-nzl2.onrender.com/api
     - Proxies it through the built-in image optimization API route (`/_next/image`)
     - Downloads the image on-demand, the first time it's requested
     - Caches it (if possible) for future requests (on the server or CDN like Vercel)
+- __Any downside to using server action instead of normal API requests?__
+
+## Unit Testing in React (Workshops App)
+- Using Jest and RTL
+- Fix bugs: product pagination, app/api/products/route.test.ts

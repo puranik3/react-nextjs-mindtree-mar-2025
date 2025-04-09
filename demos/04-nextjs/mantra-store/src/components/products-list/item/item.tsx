@@ -1,7 +1,12 @@
+'use client';
+
 import { IProduct } from "@/types/Product";
 import Link from "next/link";
 import Image from "next/image";
-import { FaShareAlt } from "react-icons/fa";
+import { FaShareAlt, FaShoppingCart } from "react-icons/fa";
+import { useState } from "react";
+import { useCart } from "@/context/shopping-cart";
+import { useSession } from "next-auth/react";
 
 import classes from "./item.module.scss";
 
@@ -21,6 +26,12 @@ const getBgColor = (category: IProduct["category"]) => {
 };
 
 const ProductListItem = ({ product }: Props) => {
+    const { changeQuantity } = useCart();
+
+    // get session information using useSession(), and maintain the data in state
+    const { data: session, status } = useSession();
+    const loading = status === "loading";
+
     return (
         <div className="`flex flex-col w-full rounded-md shadow-md overflow-hidden border bg-white ${classes.category__container}`">
             {/* Category Tag */}
@@ -71,6 +82,19 @@ const ProductListItem = ({ product }: Props) => {
                 >
                     <FaShareAlt />
                 </button>
+
+                {
+                    session && !loading && (
+                        <button
+                            aria-label="add to cart"
+                            onClick={() => changeQuantity(product._id, 1)}
+                            className="text-gray-700 hover:text-gray-900 p-2 rounded"
+                        >
+                            <FaShoppingCart className="text-xl" />
+                        </button>
+                    )
+                }
+
                 <Link
                     href={`/products/${product._id}`}
                     className="text-sm font-semibold text-blue-600 hover:underline"

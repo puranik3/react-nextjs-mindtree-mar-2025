@@ -3,13 +3,23 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { NavLink } from 'react-router-dom'
+import { toggleTheme, themeSelector } from "../../../features/themeSlice";
 
-import { useTheme } from '../../../contexts/ThemeContext';
+// alternative imports
+// import { useDispatch } from 'react-redux';
+import { useAppDispatch } from "../../../store";
+
+// import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../store';
+
+// import { useTheme } from '../../../contexts/ThemeContext';
 
 import './Menu.scss';
 
 const Menu = () => {
-    const { theme, toggleTheme } = useTheme();
+    // const { theme, toggleTheme } = useTheme();
+    const dispatch = useAppDispatch();
+    const theme = useAppSelector(themeSelector)
 
     return (
         <Navbar collapseOnSelect expand="lg" className={`bg-${theme}`}>
@@ -28,7 +38,7 @@ const Menu = () => {
                         <NavDropdown.Item to="/workshops/favorites" as={NavLink}>
                             Favorites
                         </NavDropdown.Item>
-                        <NavDropdown.Item href="#" onClick={toggleTheme}>
+                        <NavDropdown.Item href="#" onClick={() => dispatch(toggleTheme())}>
                             Change Theme
                         </NavDropdown.Item>
                     </NavDropdown>

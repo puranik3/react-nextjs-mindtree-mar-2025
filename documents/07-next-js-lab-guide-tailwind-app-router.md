@@ -3322,7 +3322,7 @@ import { changePassword } from '@/services/auth';
 import { z } from 'zod';
 
 const passwordSchema = z.object({
-  oldPassword: z.string().min(6, 'Old password must be at least 8 characters'),
+  oldPassword: z.string().min(8, 'Old password must be at least 8 characters'),
   newPassword: z.string().min(8, 'New password must be at least 8 characters'),
 });
 
@@ -3526,7 +3526,7 @@ export const createReview = async (_id: string, review: IReview) => {
             date: review.date.toString(),
         };
     });
-    return serializedProductReviews.reviews;
+    return serializedProductReviews; // check this is correct
 };
 ```
 
@@ -4527,6 +4527,8 @@ export default async function CartPage() {
 -   `src/components/cart/cart.tsx` - We create the `Cart` component that is used in the CartPage.
 
 ```tsx
+'use client'; // we are using context (useCart -> useContext)
+
 import { useCart } from "@/context/shopping-cart";
 import { ICartItem } from "@/types/Cart";
 import { IProduct } from "@/types/Product";
@@ -4790,7 +4792,7 @@ export default function Cart({ cart }: Props) {
 
 ## Step 43: Understanding middleware
 - Middleware runs before page/component is rendered. It is apt for things like authentication, redirects, localization, and logging. It is executed before the request reaches your route handlers or page components, giving you control over the flow.
-- In `src/middleware.tsx`
+- In `src/middleware.ts`
 ```ts
 // middleware.ts
 import { NextResponse } from "next/server";
@@ -4892,7 +4894,7 @@ export async function middleware(request: NextRequest) {
 NEXT_API_SITE_URL=https://mantra-server-nzl2.onrender.com/api
 ```
 - Make sure to restart the dev server (changes in `.env` files may not get picked up otherwise)
-- We demonstrate use of `fetch` using `app/products/[id]/page.tsx`. Note that we have removed the `revalidate` constant from the top of the page. Setting `{next : { revalidate: 60 } }` as the `fetch` options achieves ISR.
+- We demonstrate use of `fetch` using `app/products/[id]/layout.tsx`. Note that we have removed the `revalidate` constant from the top of the page. Setting `{next : { revalidate: 60 } }` as the `fetch` options achieves ISR.
 ```tsx
 import { ProductProvider } from "@/context/product-context";
 import ProductDetail from "@/components/product-detail/product-detail";
