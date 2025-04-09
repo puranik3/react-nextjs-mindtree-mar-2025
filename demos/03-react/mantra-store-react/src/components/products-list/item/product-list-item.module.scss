@@ -1,0 +1,23 @@
+.card {
+    position: relative;
+
+    .card__image {
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .card__title {
+        min-height: 80px;
+    }
+
+    .card__category__badge {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        opacity: 0.75;
+        border-radius: 0;
+        // font-size: 1em;
+        // transform: rotate(270deg) translateY(-27px);
+        // transform-origin: top right;
+    }
+}

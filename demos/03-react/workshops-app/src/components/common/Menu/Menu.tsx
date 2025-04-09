@@ -3,23 +3,36 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { NavLink } from 'react-router-dom'
-import { toggleTheme, themeSelector } from "../../../features/themeSlice";
+
+// Redux imports
+// import { toggleTheme, themeSelector } from "../../../features/themeSlice";
 
 // alternative imports
 // import { useDispatch } from 'react-redux';
-import { useAppDispatch } from "../../../store";
+// import { useAppDispatch } from "../../../store";
 
 // import { useSelector } from 'react-redux';
-import { useAppSelector } from '../../../store';
+// import { useAppSelector } from '../../../store';
 
+// Context API imports
 // import { useTheme } from '../../../contexts/ThemeContext';
+
+// Zustand imports
+import useStore from '../../../store.zustand';
 
 import './Menu.scss';
 
 const Menu = () => {
+    // context API
     // const { theme, toggleTheme } = useTheme();
-    const dispatch = useAppDispatch();
-    const theme = useAppSelector(themeSelector)
+
+    // Redux
+    // const dispatch = useAppDispatch();
+    // const theme = useAppSelector(themeSelector)
+
+    // Zustand
+    const theme = useStore((state) => state.theme);
+    const toggleTheme = useStore((state) => state.toggleTheme);
 
     return (
         <Navbar collapseOnSelect expand="lg" className={`bg-${theme}`}>
@@ -38,7 +51,12 @@ const Menu = () => {
                         <NavDropdown.Item to="/workshops/favorites" as={NavLink}>
                             Favorites
                         </NavDropdown.Item>
-                        <NavDropdown.Item href="#" onClick={() => dispatch(toggleTheme())}>
+                        {/* Redux */}
+                        {/* <NavDropdown.Item href="#" onClick={() => dispatch(toggleTheme())}>
+                            Change Theme
+                        </NavDropdown.Item> */}
+                        {/* Zustand / Context API */}
+                        <NavDropdown.Item href="#" onClick={toggleTheme}>
                             Change Theme
                         </NavDropdown.Item>
                     </NavDropdown>

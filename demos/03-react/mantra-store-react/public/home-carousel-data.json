@@ -1,0 +1,20 @@
+[
+    {
+        "src": "https://picsum.photos/1200/400",
+        "alt": "First slide",
+        "label": "First slide label",
+        "text": "Nulla vitae elit libero, a pharetra augue mollis interdum."
+    },
+    {
+        "src": "https://picsum.photos/600/200",
+        "alt": "Second slide",
+        "label": "Second slide label",
+        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        "src": "https://picsum.photos/900/300",
+        "alt": "Third slide",
+        "label": "Third slide label",
+        "text": "Praesent commodo cursus magna, vel scelerisque nisl consectetur."
+    }
+]
