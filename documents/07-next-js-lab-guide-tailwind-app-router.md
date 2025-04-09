@@ -4978,3 +4978,12 @@ export default async function ProductLayout({ params, children }: Props) {
 - __EXERCISES__:
     - Try SSR and SSG using appropriate fetch options
     - Use `fetch()` to external API, instead of calling service methods to access the database in other pages as well.
+
+---
+
+## Bonus content: Setting up unit testing using GitHub Copilot
+- Open Copilot in the workspace of your project.
+- Query - How to set up unit testing for the mantra-store Next JS app?
+    - Follow the steps (keep __tests__ within `src` folder)
+    - Debug when necessary with the help of GitHub Copilot
+- Set up a sample test, and tests for `src/components/home/home.tsx`, and for `app/api/products/route.ts`
