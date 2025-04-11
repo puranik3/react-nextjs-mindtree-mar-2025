@@ -9,7 +9,9 @@ type IGetProductsResponse = {
     };
 };
 
-export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
+export const getProducts = async (
+    page = 1
+): Promise<IGetProductsResponse["message"]> => {
     // const res = await fetch(`/api/products?page=${page}`)
 
     // Frotend fetch() - This fetch() IS NOT MODIFIED by Next JS
@@ -24,5 +26,5 @@ export const getProducts = async (page = 1): Promise<IGetProductsResponse> => {
     }
 
     const data: IGetProductsResponse = await res.json();
-    return data;
+    return data.message;
 };

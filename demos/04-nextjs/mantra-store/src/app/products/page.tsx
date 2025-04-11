@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import ProductsList from "@/components/products-list/products-list";
 import { getProducts } from "@/data/services/products";
+// import { getProducts } from "@/services/products";
 import type { IProduct } from "@/types/Product";
 
 import HydrateClient from "@/components/lib/react-query/hydrate-client";
@@ -15,22 +16,41 @@ export const metadata : Metadata = {
   description: "Mantra Store - search through our variety of products.",
 };
 
-export default async function ProductsPage() {
+interface Props {
+  searchParams: { [key: string]: string | undefined };
+}
+
+export default async function ProductsPage({ searchParams } : Props) {
+  const { page: strPage }  = await searchParams;
+  let numPage = 1;
+
+  if(typeof strPage === "string") {
+    const parsedPage = parseInt(strPage, 10);
+
+    if(isNaN(parsedPage) || parsedPage < 1) {
+      numPage = 1;
+    } else {
+      numPage = parsedPage;
+    }
+  }
+
   try {
     // SSG with React Query hydration
     const queryClient = new QueryClient();
 
     // Preload the page=1 data into React Query's cache
     await queryClient.prefetchQuery({
-      queryKey: ["products", 1],
-      queryFn: () => getProducts(1),
+      queryKey: ["products", numPage],
+      queryFn: () => getProducts(page),
     });
 
     const { count, page, products }: {
       count: number;
       page: number;
       products: IProduct[];
-    } = await getProducts(1);
+    } = await getProducts(numPage);
+
+    console.log(products);
 
     const dehydratedState = dehydrate(queryClient);
 

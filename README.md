@@ -15,7 +15,7 @@ https://mantra-server-nzl2.onrender.com/api
 - __Any downside to using server action instead of normal API requests?__
 
 ## Todos
-- Fix bugs: product pagination, app/api/products/route.test.ts
+- Fix bugs: product pagination (__fixed__), app/api/products/route.test.ts
 
 ## Videos on unit testing in React apps
 

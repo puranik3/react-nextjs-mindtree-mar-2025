@@ -45,9 +45,9 @@ const ProductsList = ({ products, count, page }: Props) => {
     // This useEffect() is NOT for API calls anymore - it is simply to set the other state variables (products, count) from the data obtained from useProducts()
     useEffect(
         () => {
-            if ((!initialRender.current || actualPage !== page) && data?.message) {
-                setActualProducts(data.message?.products);
-                setActualCount(data.message?.count);
+            if ((!initialRender.current || actualPage !== page) && data) {
+                setActualProducts(data.products);
+                setActualCount(data.count);
             }
 
             // console.log('data = ', data);
