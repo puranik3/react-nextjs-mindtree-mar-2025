@@ -46,7 +46,7 @@ export async function POST() {
     return NextResponse.json(
         {
             status: "error",
-            message: "METHOD=POST not allowed (todo)",
+            message: "METHOD=POST not allowed",
         } satisfies IErrorMessage,
         { status: 405 }
     );

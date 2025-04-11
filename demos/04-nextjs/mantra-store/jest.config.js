@@ -13,5 +13,4 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1', // Match the paths from tsconfig.json
     },
     setupFilesAfterEnv: ['<rootDir>/src/jest.setup.ts'],
-    testPathIgnorePatterns: ['/node_modules/', '/.next/'],
 };
