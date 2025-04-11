@@ -13,6 +13,32 @@ https://mantra-server-nzl2.onrender.com/api
     - Downloads the image on-demand, the first time it's requested
     - Caches it (if possible) for future requests (on the server or CDN like Vercel)
 - __Any downside to using server action instead of normal API requests?__
+    - Here is a framework for choosing between REST API endpoints and server actions for mutations (creating a resource, updating it etc.)
+        - Use API routes for interoperability and separation. This is useful when you have an external API server (not integrated with Next JS). It makes it interoperable - you can use it for a mobile app as well for example. Use Server Actions for tight integration with React UI and better DX in the App Router.
+            - **Use API Requests for Mutations When:**
+                1. **You need RESTful APIs** for external clients (mobile apps, third-party services).
+                2. **Your logic must be decoupled** from the frontend (e.g., reusable endpoints).
+                3. **You need fine-grained control** over headers, cookies, or authentication.
+                4. **You expect to scale backend independently** (e.g., serverless endpoints). 
+                    - **Use Cases:**
+                        - Contact forms for marketing sites.
+                        - Handling webhooks.
+                        - Mobile/IoT data submission.
+                        - CRUD APIs for decoupled frontends.
+            - **Use Server Actions for Mutations When:**
+                1. **You're working fully within the App Router** (Next.js 13+).
+                2. **You want co-location** of mutation logic with UI (React components).
+                3. **You benefit from automatic revalidation, redirect, cookies, and optimistic updates**.
+                4. **You want simplified form handling** with built-in progressive enhancement.
+                    - **Use Cases:**
+                        - Admin dashboard mutations (add/edit/delete).
+                        - Auth forms (login, signup) tightly integrated with UI.
+                        - Inline content editing.
+                        - Shopping cart interactions.
+
+
+**Summary Rule**:
+> Use **API routes** for interoperability and separation. Use **Server Actions** for tight integration with React UI and better DX in the App Router.
 
 ## Todos
 - Fix bugs (__done__): product pagination (__fixed__), app/api/products/route.test.ts (__fixed__)
